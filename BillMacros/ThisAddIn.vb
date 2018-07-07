@@ -7,5 +7,7 @@
     Private Sub ThisAddIn_Shutdown() Handles Me.Shutdown
 
     End Sub
-
+    Protected Overrides Function CreateRibbonExtensibilityObject() As Microsoft.Office.Core.IRibbonExtensibility
+        Return New KBRibbon()
+    End Function
 End Class
