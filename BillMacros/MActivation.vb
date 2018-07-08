@@ -3,7 +3,7 @@
 
     Sub TestHash()
         'run this to test md5, sha1, sha2/256, sha2/384, or sha2/512
-        Dim sIn As String, sOut As String, bB64 As Boolean, sH As String
+        Dim sIn As String, bB64 As Boolean, sH As String
         Dim App As String, Ver As String, ProdID As String, AppSaltNo
 
         'insert the text to hash within the sIn quotes
@@ -31,7 +31,7 @@
 
     End Sub
 
-    Public Function MD5(ByVal sIn As String, Optional bB64 As Boolean = 0) As String
+    Public Function MD5(ByVal sIn As String, Optional bB64 As Boolean = False) As String
         'Set a reference to mscorlib 4.0 64-bit
 
         'Test with empty string input:
@@ -59,7 +59,7 @@
 
     End Function
 
-    Public Function SHA1(sIn As String, Optional bB64 As Boolean = 0) As String
+    Public Function SHA1(sIn As String, Optional bB64 As Boolean = False) As String
         'Set a reference to mscorlib 4.0 64-bit
 
         'Test with empty string input:
@@ -87,7 +87,7 @@
 
     End Function
 
-    Public Function SHA256(sIn As String, Optional bB64 As Boolean = 0) As String
+    Public Function SHA256(sIn As String, Optional bB64 As Boolean = False) As String
         'Set a reference to mscorlib 4.0 64-bit
 
         'Test with empty string input:
@@ -114,7 +114,7 @@
 
     End Function
 
-    Public Function SHA384(sIn As String, Optional bB64 As Boolean = 0) As String
+    Public Function SHA384(sIn As String, Optional bB64 As Boolean = False) As String
         'Set a reference to mscorlib 4.0 64-bit
 
         'Test with empty string input:
@@ -141,7 +141,7 @@
 
     End Function
 
-    Public Function SHA512(sIn As String, Optional bB64 As Boolean = 0) As String
+    Public Function SHA512(sIn As String, Optional bB64 As Boolean = False) As String
         'Set a reference to mscorlib 4.0 64-bit
 
         'Test with empty string input:

@@ -10,7 +10,7 @@
 
     Sub PageFormat()
         'On Error GoTo errHandler
-        Dim Wksht As Worksheet, BillSheets As Excel.Sheets, StartSht As Worksheet
+        Dim Wksht As Excel.Worksheet, BillSheets As Excel.Sheets, StartSht As Excel.Worksheet
         Dim FSSel As New FSheetSel
         Dim xlAp As Excel.Application
         Dim XlWb As Excel.Workbook
@@ -21,40 +21,39 @@
         StartSht = XlSh
         ShowActivationNotice() 'Show activation warning window
         FSSel.Text = "Page Format"
-        FSSel.SelSheets.Enabled = True
-        FSSel.Show()
+        FSSel.ShowDialog()
+        If FSSel.DialogResult <> System.Windows.Forms.DialogResult.OK Then Return
 
-        If FSSel.OK.Tag = True Then
-            LogTrackInfo("PageFormat")
-            If IsActivated() Then
-                If FSSel.SelSheets.Enabled = True Then
-                    BillSheets = xlAp.ActiveWindow.SelectedSheets
-                Else
-                    BillSheets = XlWb.Worksheets
-                End If
-            Else
+        LogTrackInfo("PageFormat")
+        If IsActivated() Then
+            If FSSel.SelSheets.Checked = True Then
                 BillSheets = xlAp.ActiveWindow.SelectedSheets
-                'The Add method for a collection add an object and for Sheets it adds a sheet to Excel.
-                'It seems that it is not possible to a Sheets collection seperate from Excel.
+            Else
+                BillSheets = XlWb.Worksheets
             End If
-
-            For Each Wksht In BillSheets
-                Wksht.Select()
-
-                If CheckSheetType(Wksht) = "#BillSheet#" Then
-                    Call EditFormatSub(Wksht)
-                    Call PageFormatSub(Wksht)
-                    If NoShtItems > 0 Then
-                        Wksht.Tab.Color = Drawing.Color.Red
-                    Else
-                        Wksht.Tab.Color = Drawing.Color.Yellow
-                    End If
-                End If
-            Next
+        Else
+            BillSheets = xlAp.ActiveWindow.SelectedSheets
+            'The Add method for a collection add an object and for Sheets it adds a sheet to Excel.
+            'It seems that it is not possible to a Sheets collection seperate from Excel.
         End If
+        FSSel.Dispose()
+
+        For Each Wksht In BillSheets
+            Wksht.Select()
+
+            If CheckSheetType(Wksht) = "#BillSheet#" Then
+                Call EditFormatSub(Wksht)
+                Call PageFormatSub(Wksht)
+                If NoShtItems > 0 Then
+                    Wksht.Tab.Color = Drawing.Color.Red
+                Else
+                    Wksht.Tab.Color = Drawing.Color.Yellow
+                End If
+            End If
+        Next
         StartSht.Select()
     End Sub
-    Sub PageFormatSub(Billsheet As Worksheet)
+    Sub PageFormatSub(Billsheet As Excel.Worksheet)
         'This function does the following:
         '- Adds line spacing
         '- Adds page ends
@@ -62,15 +61,15 @@
         '- Sets freeze panes
         Dim BillRow As Integer, EndBillRow As Integer
         Dim RowType As String
-        Dim BillTemplate As Worksheet
+        Dim BillTemplate As Excel.Worksheet
         Dim xlAp As Excel.Application
         xlAp = Globals.ThisAddIn.Application
         BillTemplate = GetBillTemplateSheet()
 
         If CheckSheetType(Billsheet) = "#BillSheet#" Then
-            xlap.ScreenUpdating = False
+            xlAp.ScreenUpdating = False
             Call DeletePageBreaks(Billsheet)
-            Erase HdrInfo 'Set all values to zero
+            SetHdrInfoToZero(0) 'Initialise HdrInfo to zero
             NoShtItems = 0
             HItNo = 0
 
@@ -79,8 +78,8 @@
                 EndBillRow = .Columns(1).Find("#BillEnd#").Row
                 BillRow = 1
                 Do While BillRow <= EndBillRow 'Use a Do While because a For Next loop can be endless if the end value is changed
-                    xlap.StatusBar = "PageFormat/ Sheet: " & Billsheet.Name & "/ Row:" & BillRow & " of " & EndBillRow
-                    RowType = GetRowType(.Cells(BillRow, 1))
+                    xlAp.StatusBar = "PageFormat/ Sheet: " & Billsheet.Name & "/ Row:" & BillRow & " of " & EndBillRow
+                    RowType = GetRowType(.Cells(BillRow, 1).value)
                     Select Case RowType
 
                         Case "ITEM", "ITEM1", "ITEM2", "ITEM3" 'ITEM, ITEM1, ITEM2 or ITEM2 only has an effect on the formatting
@@ -156,7 +155,7 @@
         xlAp.ActiveWindow.FreezePanes = True
 
         xlAp.ScreenUpdating = True
-        xlap.StatusBar = False
+        xlAp.StatusBar = False
     End Sub
     Function GetRowType(RowTypeText As String) As String
         RowTypeText = UCase(Trim(RowTypeText))
@@ -182,7 +181,7 @@
                 GetRowType = "NOTE"
         End Select
     End Function
-    Sub InsertPageBreaks(Billsheet As Worksheet)
+    Sub InsertPageBreaks(Billsheet As Excel.Worksheet)
         'Set the forced page parameters that affect page breaks
         Dim MaxPages As Integer 'The maximum number of pages that will be processed
         'Determine the page breaks and insert pagebreak lines
@@ -197,7 +196,7 @@
         Dim SumRowHeights As Single, i As Integer, InsertRowHeight As Single, PBRowHeight As Single
         Dim LastVisibleRow As Integer, LastBillRow As Integer
 
-        Dim BillTemplate As Worksheet
+        Dim BillTemplate As Excel.Worksheet
         BillTemplate = GetBillTemplateSheet()
         Dim xlAp As Excel.Application
         xlAp = Globals.ThisAddIn.Application
@@ -225,7 +224,7 @@
 
 
             While BreakNo <= TotalPageBreaks And BreakNo < MaxPages
-                xlap.StatusBar = "InsertPageBreaks/ Sheet: " & Billsheet.Name & "/ Break No:" & BreakNo & " of " & TotalPageBreaks
+                xlAp.StatusBar = "InsertPageBreaks/ Sheet: " & Billsheet.Name & "/ Break No:" & BreakNo & " of " & TotalPageBreaks
                 BreakLine = .HPageBreaks.Item(BreakNo).Location.Row
                 SumRowHeights = 0
                 'Decrement BreakLine until the sum of row heights is larger than the PB row height
@@ -275,12 +274,12 @@
             End If
         End With
     End Sub
-    Sub DeletePageBreaks(Billsheet As Worksheet)
+    Sub DeletePageBreaks(Billsheet As Excel.Worksheet)
         With Billsheet
             Dim BillRow As Integer, LastBillRow As Integer
             LastBillRow = .Columns(1).Find("#BillEnd#").Row
             For BillRow = 1 To LastBillRow
-                Select Case .Cells(BillRow, 1)
+                Select Case .Cells(BillRow, 1).value
                     Case "PB"
                         .Rows(BillRow).Delete
                         BillRow = BillRow - 1
@@ -316,11 +315,11 @@
             HdrInfo(i).NoHdrItems = HdrInfo(i).NoHdrItems + 1
         Next
     End Sub
-    Sub HideHdrGrpRows(Billsheet As Worksheet, BillRow As Integer, RowType As String)
+    Sub HideHdrGrpRows(Billsheet As Excel.Worksheet, BillRow As Integer, RowType As String)
         'Hide rows if the hdr group is not used
         'Keep higher level hdr group if a lower hdr group is used
         'This sub should be called for each hdr and at Billend
-        Dim FromRow As Integer, ToRow As Integer, i As Integer
+        Dim i As Integer
         Select Case RowType
             Case "IHDR" 'H0 terminates groups H0, H1, H2 & H3 and starts new H0 group
                 If HdrInfo(0).NoHdrItems = 0 And HdrInfo(0).PrevHdrRow > 0 Then
@@ -381,7 +380,7 @@
             HdrInfo(i).PrevHdrRow = 0
         Next
     End Sub
-    Sub HideRows(Billsheet As Worksheet, ByVal FromRow As Integer, ByVal ToRow As Integer)
+    Sub HideRows(Billsheet As Excel.Worksheet, ByVal FromRow As Integer, ByVal ToRow As Integer)
         'Hide all rows between StartRow and EndRow including StartRow and Endrow
         'Note that there are empty rows between each row and therefore the previous row is -2
         Dim R As Integer
@@ -391,10 +390,9 @@
             Next
         End If
     End Sub
-    Sub CopyBillRow(Billsheet As Worksheet, FromRange As Excel.Range, ToRange As Excel.Range)
+    Sub CopyBillRow(Billsheet As Excel.Worksheet, FromRange As Excel.Range, ToRange As Excel.Range)
         'Copy formats FromRange on BillTemplate to ToRange on Billsheet.
         'Formulas that start with "=" are modified and copied
-        Dim t As String
         Dim ColOffset As Integer, RowOffset As Integer
         Dim LoopCell As Excel.Range
         Dim xlAp As Excel.Application

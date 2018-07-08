@@ -1,4 +1,4 @@
-﻿'TODO:  Follow these steps to enable the Ribbon (XML) item:
+﻿'Follow these steps to enable the Ribbon (XML) item:
 
 '1: Copy the following code block into the ThisAddin, ThisWorkbook, or ThisDocument class.
 

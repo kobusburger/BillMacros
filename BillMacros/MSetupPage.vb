@@ -4,7 +4,7 @@
     Sub SetPage()
         'Set info parameters for each sheet
         'Set the First Page Number for each sheet
-        Dim Wksht As Worksheet, BillSheets As Excel.Sheets 'Set freeze pane
+        Dim Wksht As Excel.Worksheet, BillSheets As Excel.Sheets 'Set freeze pane
         Dim ActShtName As String
         Dim xlAp As Excel.Application
         Dim XlWb As Excel.Workbook
@@ -13,55 +13,57 @@
         xlAp = Globals.ThisAddIn.Application
         XlWb = xlAp.ActiveWorkbook
         XlSh = XlWb.ActiveSheet
+
+
+
         ActShtName = XlSh.Name
         ShowActivationNotice() 'Show activation warning window
 
         FSSel.Text = "Setup page"
-        FSSel.SelSheets.Enabled = True
-        FSSel.Show()
+        FSSel.ShowDialog()
+        If FSSel.DialogResult <> System.Windows.Forms.DialogResult.OK Then Return
 
-        If FSSel.OK.Tag = True Then
-            LogTrackInfo("SetPage")
-            If FSSel.SelSheets.Enabled = True Then
-                BillSheets = xlAp.ActiveWindow.SelectedSheets
-            Else
-                BillSheets = XlWb.Worksheets
-            End If
-            xlAp.ScreenUpdating = False
-            GetInfoShtPar() 'Put the page parameters on the Info sheet into BillInfoDict
-            LastPageNo = 0
-            If BillInfoDict.ContainsKey("FirstPageNumber") Then LastPageNo = BillInfoDict("FirstPageNumber") - 1
-            For Each Wksht In BillSheets
-                Wksht.Select()
-                xlAp.StatusBar = "Setup Page/ Sheet: " & Wksht.Name
-                If (CheckSheetType(Wksht) = "#BillSheet#" And Wksht.Tab.Color = RGB(255, 0, 0)) Or
-            CheckSheetType(Wksht) = "#SumSheet#" Then
-                    Wksht.Select() 'The worksheet needs to be selected for pagesetup to accept changes correctly
-
-                    xlAp.PrintCommunication = False
-                    Wksht.PageSetup.FirstPageNumber = LastPageNo + 1
-                    LastPageNo = LastPageNo + Wksht.HPageBreaks.Count + 1
-                    xlAp.PrintCommunication = True
-
-                    Call SetPageSub(Wksht)
-                End If
-            Next
+        LogTrackInfo("SetPage")
+        If FSSel.SelSheets.Checked = True Then
+            BillSheets = xlAp.ActiveWindow.SelectedSheets
+        Else
+            BillSheets = XlWb.Worksheets
         End If
+        FSSel.Dispose()
+
+        xlAp.ScreenUpdating = False
+        GetInfoShtPar() 'Put the page parameters on the Info sheet into BillInfoDict
+        LastPageNo = 0
+        If BillInfoDict.ContainsKey("FirstPageNumber") Then LastPageNo = BillInfoDict("FirstPageNumber") - 1
+        For Each Wksht In BillSheets
+            Wksht.Select()
+            xlAp.StatusBar = "Setup Page/ Sheet: " & Wksht.Name
+            If (CheckSheetType(Wksht) = "#BillSheet#" And Wksht.Tab.Color = RGB(255, 0, 0)) Or
+            CheckSheetType(Wksht) = "#SumSheet#" Then
+                Wksht.Select() 'The worksheet needs to be selected for pagesetup to accept changes correctly
+
+                xlAp.PrintCommunication = False
+                Wksht.PageSetup.FirstPageNumber = LastPageNo + 1
+                LastPageNo = LastPageNo + Wksht.HPageBreaks.Count + 1
+                xlAp.PrintCommunication = True
+
+                Call SetPageSub(Wksht)
+            End If
+        Next
         xlAp.ScreenUpdating = True
         xlAp.StatusBar = False
         XlWb.Sheets(ActShtName).Select
     End Sub
-    Sub SetPageSub(Billsheet As Worksheet)
+    Sub SetPageSub(Billsheet As Excel.Worksheet)
         'Set the parameters for "page layout" according to the info sheet
         'Add reference for "Microsoft Scrupting Library Runtime
-        Dim Wksht As Worksheet
         Dim xlAp As Excel.Application
         xlAp = Globals.ThisAddIn.Application
 
         Call SetForcedPagePar(Billsheet) 'Set forced page parameters
 
         With Billsheet.PageSetup
-            xlap.PrintCommunication = False
+            xlAp.PrintCommunication = False
 
             If BillInfoDict.ContainsKey("PrintTitleRows") Then .PrintTitleRows = BillInfoDict("PrintTitleRows")
 
@@ -85,7 +87,7 @@
 
         End With
     End Sub
-    Sub SetForcedPagePar(Billsheet As Worksheet)
+    Sub SetForcedPagePar(Billsheet As Excel.Worksheet)
         'The parameters are forced so that Bill Macros can work as expected
         Dim xlAp As Excel.Application
         xlAp = Globals.ThisAddIn.Application
@@ -102,22 +104,22 @@
             .PaperSize = Excel.XlPaperSize.xlPaperA4
             .PrintHeadings = False
             .PrintGridlines = False
-            .PrintComments = Excel.XlPrintLocation.xlPrintNoComments
-            xlAp.PrintCommunication = True
+            '.PrintComments = Excel.XlPrintLocation.xlPrintNoComments 'This gives an error when PrintCommunications is set to Yes
+            xlAp.PrintCommunication = True 'An error here refers to a problem in the previous lines
         End With
     End Sub
     Sub GetInfoShtPar()
         'Use Bill Info sheet and parameters if the sheet or parameters are avaialable
         'Otherwise insert Bill Info sheet
         Dim EndBillInfoRow As Integer, InfoRow As Integer
-        Dim BillInfoSheet As Worksheet
+        Dim BillInfoSheet As Excel.Worksheet
 
         BillInfoSheet = GetInfoSheet()
 
         'Get parameters from Bill Info sheet
         EndBillInfoRow = BillInfoSheet.Columns(1).Find("#EndBillInfo#").Row
         For InfoRow = 2 To EndBillInfoRow
-            If Len(BillInfoSheet.Cells(InfoRow, 1)) > 3 Then
+            If Len(BillInfoSheet.Cells(InfoRow, 1).value) > 3 Then 'todo .value is not recognised by VS?
                 BillInfoDict(BillInfoSheet.Cells(InfoRow, 1).Value) = BillInfoSheet.Cells(InfoRow, 2).Value
             End If
         Next

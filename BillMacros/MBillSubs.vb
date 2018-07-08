@@ -1,5 +1,5 @@
 ﻿Module MBillSubs
-    Function ItemIsNotEmpty(Billsheet As Worksheet, ItemRow As Integer) As Boolean
+    Function ItemIsNotEmpty(Billsheet As Excel.Worksheet, ItemRow As Integer) As Boolean
         Dim xlAp As Excel.Application
         xlAp = Globals.ThisAddIn.Application
         ItemIsNotEmpty = False
@@ -9,20 +9,20 @@
             End If
         End With
     End Function
-    Function CheckSheetType(Billsheet As Worksheet) As String
+    Function CheckSheetType(Billsheet As Excel.Worksheet) As String
         With Billsheet
             CheckSheetType = ""
-            Select Case .Cells(1, 1)
+            Select Case .Cells(1, 1).value
                 Case "#BillSheet#"
                     If Not (.Columns(1).Find("#BillEnd#") Is Nothing) And
-               Not (.Columns(1).Find("ColHDR") Is Nothing) Then
+                        Not (.Columns(1).Find("ColHDR") Is Nothing) Then
                         CheckSheetType = "#BillSheet#"
                     Else
                         MsgBox("Column A of '" & Billsheet.Name & "' not correctly formatted")
                     End If
                 Case "#SumSheet#"
                     If Not (.Columns(1).Find("BillGrpStart") Is Nothing) And
-               Not (.Columns(1).Find("BillGrpEnd") Is Nothing) Then
+                        Not (.Columns(1).Find("BillGrpEnd") Is Nothing) Then
                         CheckSheetType = "#SumSheet#"
                     Else
                         MsgBox("Column A of '" & Billsheet.Name & "' not correctly formatted")
@@ -39,7 +39,7 @@
     End Function
 
     Function GetInfoPar(InfoPar As String) As String
-        Dim Wksht As Worksheet, BillInfoSheet As Worksheet
+        Dim BillInfoSheet As Excel.Worksheet
         Dim EndBillInfoRow As Integer, InfoRow As Integer
         BillInfoSheet = GetInfoSheet()
         GetInfoPar = ""
@@ -47,27 +47,27 @@
 
         EndBillInfoRow = BillInfoSheet.Columns(1).Find("#EndBillInfo#").Row
         For InfoRow = 2 To EndBillInfoRow
-            If BillInfoSheet.Cells(InfoRow, 1) = InfoPar Then
+            If BillInfoSheet.Cells(InfoRow, 1).value = InfoPar Then
                 GetInfoPar = BillInfoSheet.Cells(InfoRow, 2).Value
             End If
         Next
     End Function
     Sub SetInfoPar(InfoPar As String, ParVal As Object)
-        Dim Wksht As Worksheet, BillInfoSheet As Worksheet
+        Dim BillInfoSheet As Excel.Worksheet
         Dim EndBillInfoRow As Integer, InfoRow As Integer
         BillInfoSheet = GetInfoSheet()
         If BillInfoSheet Is Nothing Then Exit Sub
 
         EndBillInfoRow = BillInfoSheet.Columns(1).Find("#EndBillInfo#").Row
         For InfoRow = 2 To EndBillInfoRow
-            If BillInfoSheet.Cells(InfoRow, 1) = InfoPar Then
+            If BillInfoSheet.Cells(InfoRow, 1).value = InfoPar Then
                 BillInfoSheet.Cells(InfoRow, 2).Value = ParVal
             End If
         Next
     End Sub
-    Function GetInfoSheet() As Worksheet
+    Function GetInfoSheet() As Excel.Worksheet
         'Search for "Info" sheet and insert if it does not exist
-        Dim Wksht As Worksheet, BillSheets As Excel.Sheets
+        Dim Wksht As Excel.Worksheet, BillSheets As Excel.Sheets
         Dim xlAp As Excel.Application
         Dim XlWb As Excel.Workbook
         Dim XlSh As Excel.Worksheet
@@ -87,9 +87,9 @@
         End If
         GetInfoSheet.Tab.Color = Drawing.Color.Blue
     End Function
-    Function GetBillTemplateSheet() As Worksheet
+    Function GetBillTemplateSheet() As Excel.Worksheet
         'Search for "BillTemplate" sheet and insert if it does not exist
-        Dim Wksht As Worksheet, BillSheets As Excel.Sheets
+        Dim Wksht As Excel.Worksheet, BillSheets As Excel.Sheets
         Dim xlAp As Excel.Application
         Dim XlWb As Excel.Workbook
         Dim XlSh As Excel.Worksheet
@@ -114,9 +114,9 @@
         End If
         GetBillTemplateSheet.Tab.Color = Drawing.Color.Blue
     End Function
-    Function GetSumTemplateSheet() As Worksheet
+    Function GetSumTemplateSheet() As Excel.Worksheet
         'Search for "SumTemplate" sheet and insert if it does not exist
-        Dim Wksht As Worksheet, BillSheets As Excel.Sheets
+        Dim Wksht As Excel.Worksheet, BillSheets As Excel.Sheets
         Dim Cell As Excel.Range
         Dim xlAp As Excel.Application
         Dim XlWb As Excel.Workbook
@@ -163,9 +163,9 @@
             On Error GoTo 0
         Next
     End Function
-    Function GetSumSheet() As Worksheet
+    Function GetSumSheet() As Excel.Worksheet
         'Search for "Summary" sheet and insert if it does not exist
-        Dim Wksht As Worksheet, BillSheets As Excel.Sheets
+        Dim Wksht As Excel.Worksheet, BillSheets As Excel.Sheets
         Dim xlAp As Excel.Application
         Dim XlWb As Excel.Workbook
         Dim XlSh As Excel.Worksheet
@@ -183,7 +183,7 @@
         End If
         GetSumSheet.Tab.Color = Drawing.Color.Green
     End Function
-    Function NamedRangeExists(Wksht As Worksheet, R As String) As Boolean
+    Function NamedRangeExists(Wksht As Excel.Worksheet, R As String) As Boolean
         'Returns true if the named range R exist on a Wksht
         Dim TestR As Excel.Range
         On Error Resume Next

@@ -3,7 +3,7 @@
         'Save-as blank PDF
         'Only works in Excel 2007 and later
 
-        Dim Wksht As Worksheet, StartSht As Worksheet
+        Dim Wksht As Excel.Worksheet, StartSht As Excel.Worksheet
         Dim result As Boolean, First As Boolean
         Dim xlAp As Excel.Application
         Dim XlWb As Excel.Workbook
@@ -33,7 +33,7 @@
     End Sub
     Sub CreateStripped()
         'Delete hidden rows, delete non-bill columns & delete non-bill sheets
-        Dim Wksht As Worksheet, StartSht As Worksheet, FName As String
+        Dim Wksht As Excel.Worksheet, FName As String
         'Save bill with new name
         Dim xlAp As Excel.Application
         Dim XlWb As Excel.Workbook
@@ -63,9 +63,8 @@
     End Sub
     Sub CreatePriced()
         'Delete hidden rows, delete non-bill columns, delete non-bill sheets & copy priced columns to bill
-        Dim Wksht As Worksheet, StartSht As Worksheet, FName As String
-        Dim MaxRowNo As Long, LastBillRow As Integer
-        Dim MaxColNo As Long, LastBillCol As Integer
+        Dim Wksht As Excel.Worksheet, FName As String
+        Dim MaxRowNo As Integer, MaxColNo As Integer
         Dim xlAp As Excel.Application
         Dim XlWb As Excel.Workbook
         Dim XlSh As Excel.Worksheet
@@ -98,7 +97,7 @@
         Next
 
     End Sub
-    Sub DeleteXtraRowsCols(Wksht As Worksheet, EndTxt As String, LastUsedCol As Integer)
+    Sub DeleteXtraRowsCols(Wksht As Excel.Worksheet, EndTxt As String, LastUsedCol As Integer)
         'Delete column A, delete rows below last used row, delete colums right of LastUsedCol & delete hidden rows
         Dim MaxRowNo As Long, LastUsedRow As Long
         Dim MaxColNo As Long, RowNo As Long, TotRows As Long

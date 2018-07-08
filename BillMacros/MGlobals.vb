@@ -46,7 +46,6 @@
         Dim DateTimeStr As String
         Dim VersionDate As String
         '        Dim FSO As New FileSystemObject
-        Dim TT 'temporary variable
         VersionDate = VerYear & VerMonth & VerDay
         'Maybe async (only VB, not VBA) can limit the delay if the file cannot be accessed
         'https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2013/hh191443(v=vs.120)
@@ -60,12 +59,13 @@
             "BillMacros" & vbTab & VersionDate & vbTab & MenuItem
         '        On Error Resume Next
         '        TT = FSO.Drives.Item("N:") 'Drives correspond to Net Use. It may not show the correct connection status. This is specific to Aurecon network
-        If IO.File.Exists(FilePath & FileName) Then
-            IO.File.AppendAllText(FilePath & FileName, TrackText)
-            'Open(FilePath & FileName) For Append As #1
-            'Print(#1, TrackText)
-            'Close(#1)
-        End If
+        'todo try asynce for logging
+        'If IO.File.Exists(FilePath & FileName) Then
+        '    IO.File.AppendAllText(FilePath & FileName, TrackText)
+        '    'Open(FilePath & FileName) For Append As #1
+        '    'Print(#1, TrackText)
+        '    'Close(#1)
+        'End If
         '        On Error GoTo 0
     End Sub
     Function IsActivated() As Boolean

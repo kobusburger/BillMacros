@@ -3,8 +3,8 @@
         'This sub creates a summary based on the billsheets
         'A summary sheet is inserted if it does not exist
         Dim BillSheets As Excel.Sheets
-        Dim Wksht As Worksheet, SumSheet As Worksheet, BillInfoSheet As Worksheet
-        Dim SumRow As Integer, BillGrpEndRow As Integer
+        Dim Wksht As Excel.Worksheet, SumSheet As Excel.Worksheet
+        Dim SumRow As Integer
         Dim xlAp As Excel.Application
         Dim XlWb As Excel.Workbook
         Dim XlSh As Excel.Worksheet
@@ -32,12 +32,12 @@
                     xlAp.ScreenUpdating = False
                     'Delete all rows in billgroup
                     SumRow = .Columns(1).Find("BillGrpStart").Row + 1
-                    Do Until .Cells(SumRow, 1) = "BillGrpEnd"
+                    Do Until .Cells(SumRow, 1).value = "BillGrpEnd"
                         .Rows(SumRow).Delete
                     Loop
                     'Populate bill group
                     For Each Wksht In BillSheets
-                        If Wksht.Cells(1, 1) = "#BillSheet#" And Wksht.Tab.Color = RGB(255, 0, 0) Then
+                        If Wksht.Cells(1, 1).value = "#BillSheet#" And Wksht.Tab.Color = RGB(255, 0, 0) Then
                             .Rows(SumRow).Insert(shift:=Excel.XlDirection.xlDown)
                             Call InsertSumRow(SumSheet, Wksht, SumRow)
                             .Rows(SumRow).AutoFit
@@ -50,18 +50,15 @@
         End With
         xlAp.ScreenUpdating = True
     End Sub
-    Sub InsertSumRow(SumSheet As Worksheet, Wksht As Worksheet, SumRow As Integer)
+    Sub InsertSumRow(SumSheet As Excel.Worksheet, Wksht As Excel.Worksheet, SumRow As Integer)
         'Replace sheet names in each formula cell of SumBillRow with the WkSht name and
         'Insert the SumBillRow range from #SumTemplate#
         'Adjust column widths according to SumBillRow
-        Dim ReferenceFormula As String
-        Dim SumTemplate As Worksheet
+        Dim SumTemplate As Excel.Worksheet
         Dim Cell As Excel.Range
         Dim SumBillRowCols As Integer
         Dim SumBillRowRows As Integer
         Dim NewSumBillRow As Excel.Range
-        Dim FormulaText As String
-        Dim RefSheetName As String
         SumTemplate = GetSumTemplateSheet()
         SumBillRowCols = SumTemplate.Range("SumBillRow").Columns.Count
         SumBillRowRows = SumTemplate.Range("SumBillRow").Rows.Count

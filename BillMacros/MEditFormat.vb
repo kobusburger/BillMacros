@@ -1,6 +1,6 @@
 ﻿Module MEditFormat
     Sub EditFormat()
-        Dim Wksht As Worksheet, BillSheets As Excel.Sheets
+        Dim Wksht As Excel.Worksheet, BillSheets As Excel.Sheets
         Dim ActShtName As String
         Dim FSSel As New FSheetSel
         Dim xlAp As Excel.Application
@@ -12,26 +12,26 @@
         ActShtName = XlSh.Name
         ShowActivationNotice() 'Show activation warning window
         FSSel.Text = "Edit Format"
-        FSSel.SelSheets.Enabled = True
-        FSSel.Show()
+        FSSel.ShowDialog()
+        If FSSel.DialogResult <> System.Windows.Forms.DialogResult.OK Then Return
 
-        If FSSel.OK.Tag = True Then
-            LogTrackInfo("EditFormat")
-            If FSSel.SelSheets.Enabled = True Then
-                BillSheets = xlAp.ActiveWindow.SelectedSheets
-            Else
-                BillSheets = XlWb.Worksheets
-            End If
-            For Each Wksht In BillSheets
-                If CheckSheetType(Wksht) = "#BillSheet#" Then
-                    Wksht.Select()
-                    Call EditFormatSub(Wksht)
-                End If
-            Next
+        LogTrackInfo("EditFormat")
+        If FSSel.SelSheets.Checked = True Then
+            BillSheets = xlAp.ActiveWindow.SelectedSheets
+        Else
+            BillSheets = XlWb.Worksheets
         End If
+        FSSel.Dispose()
+
+        For Each Wksht In BillSheets
+            If CheckSheetType(Wksht) = "#BillSheet#" Then
+                Wksht.Select()
+                Call EditFormatSub(Wksht)
+            End If
+        Next
         XlWb.Sheets(ActShtName).Select
     End Sub
-    Sub EditFormatSub(Billsheet As Worksheet)
+    Sub EditFormatSub(Billsheet As Excel.Worksheet)
         'This function does the following:
         '- Removes line spacing
         '- Removes page ends
@@ -46,7 +46,7 @@
                 BillRow = 1
                 Do While BillRow <= LastBillRow 'Use a Do While because a For Next loop can be endless if the end value is changed
                     xlAp.StatusBar = "EditFormat/ Sheet: " & Billsheet.Name & "/ Row:" & BillRow & " of " & LastBillRow
-                    Select Case UCase(Trim(.Cells(BillRow, 1)))
+                    Select Case UCase(Trim(.Cells(BillRow, 1).value))
                         Case "PB"
                             .Rows(BillRow).Delete
                             BillRow = BillRow - 1
