@@ -23,7 +23,7 @@
         FSSel.ShowDialog()
         If FSSel.DialogResult <> System.Windows.Forms.DialogResult.OK Then Return
 
-        LogTrackInfo("SetPage")
+        LogTrackInfo("SetPageVS")
         If FSSel.SelSheets.Checked = True Then
             BillSheets = xlAp.ActiveWindow.SelectedSheets
         Else
@@ -47,7 +47,7 @@
                 LastPageNo = LastPageNo + Wksht.HPageBreaks.Count + 1
                 xlAp.PrintCommunication = True
 
-                Call SetPageSub(Wksht)
+                SetPageSub(Wksht)
             End If
         Next
         xlAp.ScreenUpdating = True
@@ -60,7 +60,7 @@
         Dim xlAp As Excel.Application
         xlAp = Globals.ThisAddIn.Application
 
-        Call SetForcedPagePar(Billsheet) 'Set forced page parameters
+        SetForcedPagePar(Billsheet) 'Set forced page parameters
 
         With Billsheet.PageSetup
             xlAp.PrintCommunication = False
@@ -119,7 +119,7 @@
         'Get parameters from Bill Info sheet
         EndBillInfoRow = BillInfoSheet.Columns(1).Find("#EndBillInfo#").Row
         For InfoRow = 2 To EndBillInfoRow
-            If Len(BillInfoSheet.Cells(InfoRow, 1).value) > 3 Then 'todo .value is not recognised by VS?
+            If Len(BillInfoSheet.Cells(InfoRow, 1).value) > 3 Then 'todo .Value is not recognised by VS because of late binding. VS does not know what type Cells(1,1) is.
                 BillInfoDict(BillInfoSheet.Cells(InfoRow, 1).Value) = BillInfoSheet.Cells(InfoRow, 2).Value
             End If
         Next

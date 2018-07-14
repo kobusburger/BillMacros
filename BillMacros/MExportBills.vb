@@ -49,10 +49,10 @@
             Select Case Wksht.Tab.Color
                 Case Drawing.Color.Red 'Red = BillSheet
                     Wksht.UsedRange.Value = Wksht.UsedRange.Value 'Remove formulas
-                    Call DeleteXtraRowsCols(Wksht, "#BillEnd#", AmtCol)
+                    DeleteXtraRowsCols(Wksht, "#BillEnd#", AmtCol)
                 Case Drawing.Color.Green 'Green = Summary
                     Wksht.UsedRange.Value = Wksht.UsedRange.Value 'Remove formulas
-                    Call DeleteXtraRowsCols(Wksht, "#SumEnd#", SumAmtCol)
+                    DeleteXtraRowsCols(Wksht, "#SumEnd#", SumAmtCol)
                 Case Else
                     xlAp.DisplayAlerts = False
                     Wksht.Delete()
@@ -84,11 +84,11 @@
                     Wksht.UsedRange.Value = Wksht.UsedRange.Value 'Remove formulas
                     Wksht.Columns(PricedAmtCol).Copy(Wksht.Columns(AmtCol))
                     Wksht.Columns(PricedRateCol).Copy(Wksht.Columns(RateCol))
-                    Call DeleteXtraRowsCols(Wksht, "#BillEnd#", AmtCol)
+                    DeleteXtraRowsCols(Wksht, "#BillEnd#", AmtCol)
                 Case Drawing.Color.Green 'Green = Summary
                     Wksht.UsedRange.Value = Wksht.UsedRange.Value 'Remove formulas
                     Wksht.Columns(SumPricedAmtCol).Copy(Wksht.Columns(SumAmtCol))
-                    Call DeleteXtraRowsCols(Wksht, "#SumEnd#", SumAmtCol)
+                    DeleteXtraRowsCols(Wksht, "#SumEnd#", SumAmtCol)
                 Case Else
                     xlAp.DisplayAlerts = False
                     Wksht.Delete()

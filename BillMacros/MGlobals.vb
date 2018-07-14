@@ -27,12 +27,12 @@
         Dim Msg As String
         Dim TerminationDate As Date
         Dim VersionDate As String
-        VersionDate = VerYear & VerMonth & VerDay
+        VersionDate = VerYear & VerMonth.ToString("-00-") & VerDay.ToString("00")
         TerminationDate = DateSerial(VerYear, VerMonth, VerDay + ActiveDays)
         Msg = "The bill functions assist with the formatting of bills" & vbCrLf & vbCrLf &
     "Written by Kobus Burger © " & Left(VersionDate, 4) & vbCrLf &
     "083 228 9674 kobusgburger@gmail.com" & vbCrLf &
-    vbCrLf & "Version: " & VersionDate & vbCrLf &
+    vbCrLf & "Version date: " & VersionDate & vbCrLf &
     "Termination date: " & TerminationDate & vbCrLf &
     "Note that activity is being logged for statistical purposes"
 
@@ -46,7 +46,7 @@
         Dim DateTimeStr As String
         Dim VersionDate As String
         '        Dim FSO As New FileSystemObject
-        VersionDate = VerYear & VerMonth & VerDay
+        VersionDate = VerYear & VerMonth.ToString("-00-") & VerDay.ToString("00")
         'Maybe async (only VB, not VBA) can limit the delay if the file cannot be accessed
         'https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2013/hh191443(v=vs.120)
 
@@ -56,17 +56,18 @@
         DateTimeStr = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
         TrackText = DateTimeStr & vbTab &
             UserName & vbTab & vbTab &
-            "BillMacros" & vbTab & VersionDate & vbTab & MenuItem
-        '        On Error Resume Next
+            "BillMacrosVS" & vbTab & VersionDate & vbTab & MenuItem
+        On Error Resume Next
         '        TT = FSO.Drives.Item("N:") 'Drives correspond to Net Use. It may not show the correct connection status. This is specific to Aurecon network
         'todo try asynce for logging
-        'If IO.File.Exists(FilePath & FileName) Then
-        '    IO.File.AppendAllText(FilePath & FileName, TrackText)
-        '    'Open(FilePath & FileName) For Append As #1
-        '    'Print(#1, TrackText)
-        '    'Close(#1)
-        'End If
-        '        On Error GoTo 0
+        'todo Implement logging on cloud server
+        If IO.File.Exists(FilePath & FileName) Then
+            IO.File.AppendAllText(FilePath & FileName, TrackText)
+            'Open(FilePath & FileName) For Append As #1
+            'Print(#1, TrackText)
+            'Close(#1)
+        End If
+        On Error GoTo 0
     End Sub
     Function IsActivated() As Boolean
         'Return true if Bill Macros is activated
@@ -117,7 +118,7 @@
             Err.Clear()
         End If
     End Function
-    'Sub TT() 'to test speed of checking if a netwrok path exists
+    'Sub TT() 'to test speed of checking if a network path exists
     '    Dim a As String, b As String, c As String
     '    Dim d, e, f
     '    Dim FSO As New FileSystemObject

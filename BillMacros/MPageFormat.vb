@@ -24,7 +24,7 @@
         FSSel.ShowDialog()
         If FSSel.DialogResult <> System.Windows.Forms.DialogResult.OK Then Return
 
-        LogTrackInfo("PageFormat")
+        LogTrackInfo("PageFormatVS")
         If IsActivated() Then
             If FSSel.SelSheets.Checked = True Then
                 BillSheets = xlAp.ActiveWindow.SelectedSheets
@@ -42,8 +42,8 @@
             Wksht.Select()
 
             If CheckSheetType(Wksht) = "#BillSheet#" Then
-                Call EditFormatSub(Wksht)
-                Call PageFormatSub(Wksht)
+                EditFormatSub(Wksht)
+                PageFormatSub(Wksht)
                 If NoShtItems > 0 Then
                     Wksht.Tab.Color = Drawing.Color.Red
                 Else
@@ -68,7 +68,7 @@
 
         If CheckSheetType(Billsheet) = "#BillSheet#" Then
             xlAp.ScreenUpdating = False
-            Call DeletePageBreaks(Billsheet)
+            DeletePageBreaks(Billsheet)
             SetHdrInfoToZero(0) 'Initialise HdrInfo to zero
             NoShtItems = 0
             HItNo = 0
@@ -89,7 +89,7 @@
                                 BillTemplate.Range("Blank").Copy(.Cells(BillRow + 1, 1))
                                 EndBillRow = EndBillRow + 1
                                 IncrementNoItems()
-                                Call CopyBillRow(Billsheet, BillTemplate.Range(RowType), .Cells(BillRow, 1))
+                                CopyBillRow(Billsheet, BillTemplate.Range(RowType), .Cells(BillRow, 1))
                                 BillRow = BillRow + 1
                             Else
                                 .Rows(BillRow).Hidden = True
@@ -97,11 +97,11 @@
                             BillRow = BillRow + BillTemplate.Range(RowType).Rows.Count
 
                         Case "IHDR", "IHDR1", "IHDR2", "IHDR3"
-                            Call HideHdrGrpRows(Billsheet, BillRow, RowType)
+                            HideHdrGrpRows(Billsheet, BillRow, RowType)
                             If ItemIsNotEmpty(Billsheet, BillRow) Then
                                 IncrementNoItems()
                             End If
-                            Call CopyBillRow(Billsheet, BillTemplate.Range(RowType), .Cells(BillRow, 1))
+                            CopyBillRow(Billsheet, BillTemplate.Range(RowType), .Cells(BillRow, 1))
                             .Rows(BillRow).AutoFit
                             .Rows(BillRow + 1).Insert(shift:=Excel.XlDirection.xlDown)
                             BillTemplate.Range("Blank").Copy(.Cells(BillRow + 1, 1))
@@ -109,7 +109,7 @@
                             BillRow = BillRow + BillTemplate.Range(RowType).Rows.Count + 1
 
                         Case "#BILLEND#"
-                            Call HideHdrGrpRows(Billsheet, BillRow, RowType)
+                            HideHdrGrpRows(Billsheet, BillRow, RowType)
                             BillTemplate.Range("BILLEND").Copy(.Cells(BillRow, 1))
                             BillRow = BillRow + BillTemplate.Range("BILLEND").Rows.Count
 
@@ -144,7 +144,7 @@
                 .PageSetup.PrintArea = .Range(.Cells(1, 2), .Cells(EndBillRow + 2, 8)).Address
                 .PageSetup.PrintTitleRows = GetInfoPar("PrintTitleRows")
             End With
-            Call InsertPageBreaks(Billsheet)
+            InsertPageBreaks(Billsheet)
         End If
         xlAp.ActiveWindow.FreezePanes = False
         xlAp.ActiveWindow.Split = False
@@ -185,7 +185,7 @@
         'Set the forced page parameters that affect page breaks
         Dim MaxPages As Integer 'The maximum number of pages that will be processed
         'Determine the page breaks and insert pagebreak lines
-        Call SetForcedPagePar(Billsheet)
+        SetForcedPagePar(Billsheet)
         'Page break variables
         Dim BreakNo As Integer, TotalPageBreaks As Integer, BreakLine As Integer, PrevBreakLine As Integer
         Dim ExtraRows As Integer
@@ -323,50 +323,49 @@
         Select Case RowType
             Case "IHDR" 'H0 terminates groups H0, H1, H2 & H3 and starts new H0 group
                 If HdrInfo(0).NoHdrItems = 0 And HdrInfo(0).PrevHdrRow > 0 Then
-                    Call HideRows(Billsheet, HdrInfo(0).PrevHdrRow, BillRow - 1)
+                    HideRows(Billsheet, HdrInfo(0).PrevHdrRow, BillRow - 1)
                 Else
                     HdrInfo(0).HNo = HdrInfo(0).HNo + 1
                 End If
-                If HdrInfo(1).NoHdrItems = 0 Then Call HideRows(Billsheet, HdrInfo(1).PrevHdrRow, BillRow - 1)
-                If HdrInfo(2).NoHdrItems = 0 Then Call HideRows(Billsheet, HdrInfo(2).PrevHdrRow, BillRow - 1)
-                If HdrInfo(3).NoHdrItems = 0 Then Call HideRows(Billsheet, HdrInfo(3).PrevHdrRow, BillRow - 1)
-                SetHdrInfoToZero(0) 'Set higher levels to zero
+                If HdrInfo(1).NoHdrItems = 0 Then HideRows(Billsheet, HdrInfo(1).PrevHdrRow, BillRow - 1)
+                If HdrInfo(2).NoHdrItems = 0 Then HideRows(Billsheet, HdrInfo(2).PrevHdrRow, BillRow - 1)
+                If HdrInfo(3).NoHdrItems = 0 Then HideRows(Billsheet, HdrInfo(3).PrevHdrRow, BillRow - 1)
+                SetHdrInfoToZero(1) 'Set higher levels to zero
                 HdrInfo(0).PrevHdrRow = BillRow
                 HItNo = 0
             Case "IHDR1" 'H1 terminates groups H1, H2 & H3 and starts new H1 group
                 If HdrInfo(1).NoHdrItems = 0 And HdrInfo(1).PrevHdrRow > 0 Then
-                    Call HideRows(Billsheet, HdrInfo(1).PrevHdrRow, BillRow - 1)
+                    HideRows(Billsheet, HdrInfo(1).PrevHdrRow, BillRow - 1)
                 Else
                     HdrInfo(1).HNo = HdrInfo(1).HNo + 1
                 End If
-                If HdrInfo(2).NoHdrItems = 0 Then Call HideRows(Billsheet, HdrInfo(2).PrevHdrRow, BillRow - 1)
-                If HdrInfo(3).NoHdrItems = 0 Then Call HideRows(Billsheet, HdrInfo(3).PrevHdrRow, BillRow - 1)
-                SetHdrInfoToZero(1) 'Set higher levels to zero
+                If HdrInfo(2).NoHdrItems = 0 Then HideRows(Billsheet, HdrInfo(2).PrevHdrRow, BillRow - 1)
+                If HdrInfo(3).NoHdrItems = 0 Then HideRows(Billsheet, HdrInfo(3).PrevHdrRow, BillRow - 1)
+                SetHdrInfoToZero(2) 'Set higher levels to zero
                 HdrInfo(1).PrevHdrRow = BillRow
                 HItNo = 0
             Case "IHDR2" 'H2 starts new H2 group and terminate H2 & H3 groups
                 If HdrInfo(2).NoHdrItems = 0 And HdrInfo(2).PrevHdrRow > 0 Then
-                    Call HideRows(Billsheet, HdrInfo(2).PrevHdrRow, BillRow - 1)
+                    HideRows(Billsheet, HdrInfo(2).PrevHdrRow, BillRow - 1)
                 Else
                     HdrInfo(2).HNo = HdrInfo(2).HNo + 1
                 End If
-                If HdrInfo(3).NoHdrItems = 0 Then Call HideRows(Billsheet, HdrInfo(3).PrevHdrRow, BillRow - 1)
-                SetHdrInfoToZero(2) 'Set higher levels to zero
+                If HdrInfo(3).NoHdrItems = 0 Then HideRows(Billsheet, HdrInfo(3).PrevHdrRow, BillRow - 1)
+                SetHdrInfoToZero(3) 'Set higher levels to zero
                 HdrInfo(2).PrevHdrRow = BillRow
                 HItNo = 0
             Case "IHDR3" 'H3 starts new H3 group and terminate H3 group
                 If HdrInfo(3).NoHdrItems = 0 And HdrInfo(3).PrevHdrRow > 0 Then
-                    Call HideRows(Billsheet, HdrInfo(3).PrevHdrRow, BillRow - 1)
+                    HideRows(Billsheet, HdrInfo(3).PrevHdrRow, BillRow - 1)
                 Else
                     HdrInfo(3).HNo = HdrInfo(3).HNo + 1
                 End If
-                SetHdrInfoToZero(3) 'Set higher levels to zero
                 HdrInfo(3).PrevHdrRow = BillRow
                 HItNo = 0
             Case "#BILLEND#" 'BILLEND terminate all groups
                 For i = 0 To 3 'Check all the levels
                     If HdrInfo(i).NoHdrItems = 0 And HdrInfo(i).PrevHdrRow > 0 Then
-                        Call HideRows(Billsheet, HdrInfo(i).PrevHdrRow, BillRow - 1)
+                        HideRows(Billsheet, HdrInfo(i).PrevHdrRow, BillRow - 1)
                     End If
                 Next
         End Select
@@ -398,6 +397,7 @@
         Dim xlAp As Excel.Application
         xlAp = Globals.ThisAddIn.Application
 
+        xlAp.DisplayAlerts = False
         FromRange.Copy() 'Copy & paste formats
         ToRange.PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormats, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=False)
         For Each LoopCell In FromRange
@@ -410,6 +410,7 @@
                 ToRange.Offset(RowOffset, ColOffset).Formula = ReplaceFormulaRefs(ToRange.Offset(RowOffset, ColOffset).Formula, "'" & Billsheet.Name & "'!")
             End If
         Next
+        xlAp.DisplayAlerts = True
     End Sub
     Function ReplaceCounters(Formula As String) As String
         'Replace the hdr and item counters in the formula
@@ -419,6 +420,11 @@
         ReplaceCounters = Replace(ReplaceCounters, "H2NO", HdrInfo(2).HNo, vbTextCompare)
         ReplaceCounters = Replace(ReplaceCounters, "H3NO", HdrInfo(3).HNo, vbTextCompare)
         ReplaceCounters = Replace(ReplaceCounters, "HITNO", HItNo, vbTextCompare)
+        ReplaceCounters = Replace(ReplaceCounters, "H0", HdrInfo(0).HNo, vbTextCompare)
+        ReplaceCounters = Replace(ReplaceCounters, "H1", HdrInfo(1).HNo, vbTextCompare)
+        ReplaceCounters = Replace(ReplaceCounters, "H2", HdrInfo(2).HNo, vbTextCompare)
+        ReplaceCounters = Replace(ReplaceCounters, "H3", HdrInfo(3).HNo, vbTextCompare)
+        ReplaceCounters = Replace(ReplaceCounters, "NO", HItNo, vbTextCompare)
     End Function
 
 

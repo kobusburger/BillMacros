@@ -15,7 +15,7 @@
         FSSel.ShowDialog()
         If FSSel.DialogResult <> System.Windows.Forms.DialogResult.OK Then Return
 
-        LogTrackInfo("EditFormat")
+        LogTrackInfo("EditFormatVS")
         If FSSel.SelSheets.Checked = True Then
             BillSheets = xlAp.ActiveWindow.SelectedSheets
         Else
@@ -26,7 +26,7 @@
         For Each Wksht In BillSheets
             If CheckSheetType(Wksht) = "#BillSheet#" Then
                 Wksht.Select()
-                Call EditFormatSub(Wksht)
+                EditFormatSub(Wksht)
             End If
         Next
         XlWb.Sheets(ActShtName).Select

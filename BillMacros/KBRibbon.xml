@@ -2,9 +2,11 @@
 <customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="Ribbon_Load" xmlns:x="KBNameSpace">
   <ribbon>
     <tabs>
-      <!--us idQ with custom namespace to make shared tabs work-->
+      <!--use idQ with custom namespace to make shared tabs work
+      https://docs.microsoft.com/en-us/visualstudio/vsto/how-to-show-add-in-user-interface-errors
+      If the ribbon does not show check if the Addin is disabled in Excel-->
       <tab idQ="x:KBTab" label="KB">
-        <group id="BillMacros" label="Bill Macros">
+        <group id="BillMacros" label="Bill Formatting">
           <button id="PageFormat" label="Page Format"
                screentip="Format sheet for printing" onAction="OnPageFormat"/>
           <button id="EditFormat" label="Edit Format"

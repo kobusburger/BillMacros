@@ -39,7 +39,7 @@
                     For Each Wksht In BillSheets
                         If Wksht.Cells(1, 1).value = "#BillSheet#" And Wksht.Tab.Color = RGB(255, 0, 0) Then
                             .Rows(SumRow).Insert(shift:=Excel.XlDirection.xlDown)
-                            Call InsertSumRow(SumSheet, Wksht, SumRow)
+                            InsertSumRow(SumSheet, Wksht, SumRow)
                             .Rows(SumRow).AutoFit
                             SumRow = SumRow + 1
                         End If

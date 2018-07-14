@@ -1,6 +1,6 @@
 ﻿Module MActivation
     'https://en.wikibooks.org/wiki/Visual_Basic_for_Applications/String_Hashing_in_VBA
-
+    'todo Implement an activation code
     Sub TestHash()
         'run this to test md5, sha1, sha2/256, sha2/384, or sha2/512
         Dim sIn As String, bB64 As Boolean, sH As String
