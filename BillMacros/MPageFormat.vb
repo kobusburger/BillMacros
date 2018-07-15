@@ -414,6 +414,7 @@
     End Sub
     Function ReplaceCounters(Formula As String) As String
         'Replace the hdr and item counters in the formula
+        'todo This function also replace occurrances in strings
         ReplaceCounters = UCase(Formula)
         ReplaceCounters = Replace(ReplaceCounters, "H0NO", HdrInfo(0).HNo, vbTextCompare)
         ReplaceCounters = Replace(ReplaceCounters, "H1NO", HdrInfo(1).HNo, vbTextCompare)

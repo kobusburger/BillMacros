@@ -18,8 +18,8 @@
 
     Public Const MacroName As String = "Bill Macros.xla"
     Const VerYear As Integer = 2018,
-    VerMonth As Integer = 5,
-    VerDay As Integer = 21
+    VerMonth As Integer = 7,
+    VerDay As Integer = 15
 
     Const ActiveDays As Integer = 180 'The functionality will be reduced after the ActiveDays
 
@@ -45,10 +45,12 @@
         Dim UserName As String
         Dim DateTimeStr As String
         Dim VersionDate As String
+        Dim LogTask As Threading.Tasks.Task
         '        Dim FSO As New FileSystemObject
         VersionDate = VerYear & VerMonth.ToString("-00-") & VerDay.ToString("00")
-        'Maybe async (only VB, not VBA) can limit the delay if the file cannot be accessed
-        'https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2013/hh191443(v=vs.120)
+        'todo Maybe async (only VB, not VBA) can limit the delay if the file cannot be accessed
+        'todo Implement logging on cloud server
+        'https://docs.microsoft.com/en-us/dotnet/visual-basic/programming-guide/concepts/async/
 
         UserName = Environ$("Username")
         FilePath = "\\aurecon.info\shares\ZAPTA\Admin\Admin\GAUZABLD\2 Modify\Building Electrical Electronic Services\Software\ExcelAddins\"
@@ -56,17 +58,12 @@
         DateTimeStr = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
         TrackText = DateTimeStr & vbTab &
             UserName & vbTab & vbTab &
-            "BillMacrosVS" & vbTab & VersionDate & vbTab & MenuItem
-        On Error Resume Next
+            "BillMacrosVS" & vbTab & VersionDate & vbTab & MenuItem & vbCrLf
+        '        On Error Resume Next
         '        TT = FSO.Drives.Item("N:") 'Drives correspond to Net Use. It may not show the correct connection status. This is specific to Aurecon network
-        'todo try asynce for logging
-        'todo Implement logging on cloud server
-        If IO.File.Exists(FilePath & FileName) Then
-            IO.File.AppendAllText(FilePath & FileName, TrackText)
-            'Open(FilePath & FileName) For Append As #1
-            'Print(#1, TrackText)
-            'Close(#1)
-        End If
+
+        On Error Resume Next
+        IO.File.AppendAllText(FilePath & FileName, TrackText)
         On Error GoTo 0
     End Sub
     Function IsActivated() As Boolean
