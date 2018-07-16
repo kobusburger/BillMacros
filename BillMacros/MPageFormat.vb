@@ -79,7 +79,7 @@
                 BillRow = 1
                 Do While BillRow <= EndBillRow 'Use a Do While because a For Next loop can be endless if the end value is changed
                     xlAp.StatusBar = "PageFormat/ Sheet: " & Billsheet.Name & "/ Row:" & BillRow & " of " & EndBillRow
-                    RowType = GetRowType(.Cells(BillRow, 1).value)
+                    RowType = UCase(Trim(.Cells(BillRow, 1).value))
                     Select Case RowType
 
                         Case "ITEM", "ITEM1", "ITEM2", "ITEM3" 'ITEM, ITEM1, ITEM2 or ITEM2 only has an effect on the formatting
@@ -401,14 +401,14 @@
         FromRange.Copy() 'Copy & paste formats
         ToRange.PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormats, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=False)
         For Each LoopCell In FromRange
-            If xlAp.WorksheetFunction.IsFormula(LoopCell) Then
-                ColOffset = LoopCell.Column - FromRange.Column
-                RowOffset = LoopCell.Row - FromRange.Row
-                LoopCell.Copy()
-                ToRange.Offset(RowOffset, ColOffset).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormulas, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=False)
-                ToRange.Offset(RowOffset, ColOffset).Formula = ReplaceCounters(ToRange.Offset(RowOffset, ColOffset).Formula)
-                ToRange.Offset(RowOffset, ColOffset).Formula = ReplaceFormulaRefs(ToRange.Offset(RowOffset, ColOffset).Formula, "'" & Billsheet.Name & "'!")
-            End If
+            '            If xlAp.WorksheetFunction.IsFormula(LoopCell) Then
+            ColOffset = LoopCell.Column - FromRange.Column
+            RowOffset = LoopCell.Row - FromRange.Row
+            LoopCell.Copy()
+            ToRange.Offset(RowOffset, ColOffset).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormulas, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=False)
+            ToRange.Offset(RowOffset, ColOffset).Formula = ReplaceCounters(ToRange.Offset(RowOffset, ColOffset).Formula)
+            ToRange.Offset(RowOffset, ColOffset).Formula = ReplaceFormulaRefs(ToRange.Offset(RowOffset, ColOffset).Formula, "'" & Billsheet.Name & "'!")
+            '            End If
         Next
         xlAp.DisplayAlerts = True
     End Sub
@@ -421,11 +421,6 @@
         ReplaceCounters = Replace(ReplaceCounters, "H2NO", HdrInfo(2).HNo, vbTextCompare)
         ReplaceCounters = Replace(ReplaceCounters, "H3NO", HdrInfo(3).HNo, vbTextCompare)
         ReplaceCounters = Replace(ReplaceCounters, "HITNO", HItNo, vbTextCompare)
-        ReplaceCounters = Replace(ReplaceCounters, "H0", HdrInfo(0).HNo, vbTextCompare)
-        ReplaceCounters = Replace(ReplaceCounters, "H1", HdrInfo(1).HNo, vbTextCompare)
-        ReplaceCounters = Replace(ReplaceCounters, "H2", HdrInfo(2).HNo, vbTextCompare)
-        ReplaceCounters = Replace(ReplaceCounters, "H3", HdrInfo(3).HNo, vbTextCompare)
-        ReplaceCounters = Replace(ReplaceCounters, "NO", HItNo, vbTextCompare)
     End Function
 
 
