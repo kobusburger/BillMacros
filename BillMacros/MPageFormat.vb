@@ -319,6 +319,7 @@
         'Hide rows if the hdr group is not used
         'Keep higher level hdr group if a lower hdr group is used
         'This sub should be called for each hdr and at Billend
+        'todo Hdrs are not correctly hidden e.g. hdr2 are hidden with an empty group but the higher hdr1 is not hidden
         Dim i As Integer
         Select Case RowType
             Case "IHDR" 'H0 terminates groups H0, H1, H2 & H3 and starts new H0 group
@@ -401,20 +402,20 @@
         FromRange.Copy() 'Copy & paste formats
         ToRange.PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormats, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=False)
         For Each LoopCell In FromRange
-            '            If xlAp.WorksheetFunction.IsFormula(LoopCell) Then
-            ColOffset = LoopCell.Column - FromRange.Column
-            RowOffset = LoopCell.Row - FromRange.Row
-            LoopCell.Copy()
-            ToRange.Offset(RowOffset, ColOffset).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormulas, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=False)
-            ToRange.Offset(RowOffset, ColOffset).Formula = ReplaceCounters(ToRange.Offset(RowOffset, ColOffset).Formula)
-            ToRange.Offset(RowOffset, ColOffset).Formula = ReplaceFormulaRefs(ToRange.Offset(RowOffset, ColOffset).Formula, "'" & Billsheet.Name & "'!")
-            '            End If
+            If xlAp.WorksheetFunction.IsFormula(LoopCell) Then
+                ColOffset = LoopCell.Column - FromRange.Column
+                RowOffset = LoopCell.Row - FromRange.Row
+                LoopCell.Copy()
+                ToRange.Offset(RowOffset, ColOffset).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormulas, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=False)
+                ToRange.Offset(RowOffset, ColOffset).Formula = ReplaceCounters(ToRange.Offset(RowOffset, ColOffset).Formula)
+                ToRange.Offset(RowOffset, ColOffset).Formula = ReplaceFormulaRefs(ToRange.Offset(RowOffset, ColOffset).Formula, "'" & Billsheet.Name & "'!")
+            End If
         Next
         xlAp.DisplayAlerts = True
     End Sub
     Function ReplaceCounters(Formula As String) As String
         'Replace the hdr and item counters in the formula
-        'todo This function also replace occurrances in strings
+        'todo This function also replace occurrances in strings. Is it possible to distinguish between variables and text?
         ReplaceCounters = UCase(Formula)
         ReplaceCounters = Replace(ReplaceCounters, "H0NO", HdrInfo(0).HNo, vbTextCompare)
         ReplaceCounters = Replace(ReplaceCounters, "H1NO", HdrInfo(1).HNo, vbTextCompare)

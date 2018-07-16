@@ -119,7 +119,7 @@
         'Get parameters from Bill Info sheet
         EndBillInfoRow = BillInfoSheet.Columns(1).Find("#EndBillInfo#").Row
         For InfoRow = 2 To EndBillInfoRow
-            If Len(BillInfoSheet.Cells(InfoRow, 1).value) > 3 Then 'todo .Value is not recognised by VS because of late binding. VS does not know what type Cells(1,1) is.
+            If Len(BillInfoSheet.Cells(InfoRow, 1).value) > 3 Then '.Value is not recognised by VS because of late binding. VS does not know what type Cells(1,1) is.
                 BillInfoDict(BillInfoSheet.Cells(InfoRow, 1).Value) = BillInfoSheet.Cells(InfoRow, 2).Value
             End If
         Next
