@@ -1,12 +1,12 @@
 ﻿Module MPageFormat
     Structure HdrInfoType
-        Dim PrevHdrRow As Integer
-        Dim NoHdrItems As Integer
-        Dim HNo As Integer
+        Dim PrevHdrRow As Integer 'Row of the previous, same level hdr
+        Dim NoHdrItems As Integer 'No of non-empty items after and including the previous hdr
+        Dim HNo As Integer 'No of the same level hdrs in the a hdr group
     End Structure
     Dim HdrInfo(3) As HdrInfoType '4 levels. The array index is the Hdr level starting at 0
-    Dim NoShtItems As Integer    'Current number of non-empty items on the billsheet
-    Dim HItNo As Integer 'Item no under any hdr group
+    Dim NoShtItems As Integer    'Current No of non-empty items on the billsheet
+    Dim HItNo As Integer 'Item no in the current hdr group
 
     Sub PageFormat()
         'On Error GoTo errHandler
@@ -69,7 +69,9 @@
         If CheckSheetType(Billsheet) = "#BillSheet#" Then
             xlAp.ScreenUpdating = False
             DeletePageBreaks(Billsheet)
-            SetHdrInfoToZero(0) 'Initialise HdrInfo to zero
+
+            'Initialise HdrInfo & counter to zero
+            SetHdrInfoToZero(0)
             NoShtItems = 0
             HItNo = 0
 
@@ -81,7 +83,6 @@
                     xlAp.StatusBar = "PageFormat/ Sheet: " & Billsheet.Name & "/ Row:" & BillRow & " of " & EndBillRow
                     RowType = UCase(Trim(.Cells(BillRow, 1).value))
                     Select Case RowType
-
                         Case "ITEM", "ITEM1", "ITEM2", "ITEM3" 'ITEM, ITEM1, ITEM2 or ITEM2 only has an effect on the formatting
                             If ItemIsNotEmpty(Billsheet, BillRow) Then
                                 .Rows(BillRow).AutoFit
@@ -106,7 +107,7 @@
                             .Rows(BillRow + 1).Insert(shift:=Excel.XlDirection.xlDown)
                             BillTemplate.Range("Blank").Copy(.Cells(BillRow + 1, 1))
                             EndBillRow = EndBillRow + 1
-                            BillRow = BillRow + BillTemplate.Range(RowType).Rows.Count + 1
+                            BillRow = BillRow + BillTemplate.Range(RowType).Rows.Count + 1 'todo Should multirow types be allowed?
 
                         Case "#BILLEND#"
                             HideHdrGrpRows(Billsheet, BillRow, RowType)
@@ -204,7 +205,6 @@
         With Billsheet
             'Initialise variables
             Const ExtraSpaceToLeave = 5
-            '    PBRowHeight = 30
             PBRowHeight = BillTemplate.Range("PB").Height / 2
             PageHeight = 297 * 72 / 25.4    'A4 = 210 mm x 297 mm; convert to points
             PrintHeight = PageHeight - .PageSetup.TopMargin - .PageSetup.BottomMargin
@@ -291,14 +291,14 @@
     Sub IncrementNoItems()
         'This should be called for each new measured item
         'The relevant counters will be incremented depending in which group the item is
-        Dim HdLv As Integer, i As Integer, PrevRow As Integer
+        Dim HdLv As Integer, i As Integer, PrHdrRow As Integer
         Dim xlAp As Excel.Application
         xlAp = Globals.ThisAddIn.Application
         NoShtItems = NoShtItems + 1
         HItNo = HItNo + 1
-        PrevRow = xlAp.WorksheetFunction.Max(HdrInfo(0).PrevHdrRow, HdrInfo(1).PrevHdrRow, HdrInfo(2).PrevHdrRow, HdrInfo(3).PrevHdrRow)
-        If PrevRow = 0 Then Exit Sub 'The item is not in an hdr group
-        Select Case PrevRow
+        PrHdrRow = xlAp.WorksheetFunction.Max(HdrInfo(0).PrevHdrRow, HdrInfo(1).PrevHdrRow, HdrInfo(2).PrevHdrRow, HdrInfo(3).PrevHdrRow)
+        If PrHdrRow = 0 Then Exit Sub 'The item is not in an hdr group i.e. before any hdrs
+        Select Case PrHdrRow
             Case HdrInfo(0).PrevHdrRow
                 HdLv = 0
             Case HdrInfo(1).PrevHdrRow
@@ -307,8 +307,6 @@
                 HdLv = 2
             Case HdrInfo(3).PrevHdrRow
                 HdLv = 3
-            Case Else
-                HdLv = -1
         End Select
 
         For i = 0 To HdLv 'Increment current and lower levels
@@ -323,7 +321,7 @@
         Dim i As Integer
         Select Case RowType
             Case "IHDR" 'H0 terminates groups H0, H1, H2 & H3 and starts new H0 group
-                If HdrInfo(0).NoHdrItems = 0 And HdrInfo(0).PrevHdrRow > 0 Then
+                If HdrInfo(0).NoHdrItems = 0 And HdrInfo(0).PrevHdrRow > 0 Then 'Empty group
                     HideRows(Billsheet, HdrInfo(0).PrevHdrRow, BillRow - 1)
                 Else
                     HdrInfo(0).HNo = HdrInfo(0).HNo + 1
@@ -402,7 +400,8 @@
         FromRange.Copy() 'Copy & paste formats
         ToRange.PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormats, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=False)
         For Each LoopCell In FromRange
-            If xlAp.WorksheetFunction.IsFormula(LoopCell) Then
+            '            If xlAp.WorksheetFunction.IsFormula(LoopCell) Then
+            If LoopCell.Column = ItemNoCol Or LoopCell.Column = PricedAmtCol Then 'Only copy cells in the "Item No" and "Amount" columns
                 ColOffset = LoopCell.Column - FromRange.Column
                 RowOffset = LoopCell.Row - FromRange.Row
                 LoopCell.Copy()

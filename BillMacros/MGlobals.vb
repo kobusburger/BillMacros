@@ -19,7 +19,7 @@
     Public Const MacroName As String = "Bill Macros.xla"
     Const VerYear As Integer = 2018,
     VerMonth As Integer = 7,
-    VerDay As Integer = 16
+    VerDay As Integer = 17
 
     Const ActiveDays As Integer = 180 'The functionality will be reduced after the ActiveDays
 
