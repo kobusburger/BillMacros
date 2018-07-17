@@ -16,10 +16,10 @@
     SumAmtCol As Integer = 4,
     SumPricedAmtCol As Integer = 5
 
-    Public Const MacroName As String = "Bill Macros.xla"
+    Public Const BillMacrosTemplate As String = "BillMacrosTemplate.xlsx" 'todo impliment BillMacrosTemplate.xlsx
     Const VerYear As Integer = 2018,
     VerMonth As Integer = 7,
-    VerDay As Integer = 16
+    VerDay As Integer = 17
 
     Const ActiveDays As Integer = 180 'The functionality will be reduced after the ActiveDays
 

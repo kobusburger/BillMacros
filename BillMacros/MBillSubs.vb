@@ -71,6 +71,7 @@
         Dim xlAp As Excel.Application
         Dim XlWb As Excel.Workbook
         Dim XlSh As Excel.Worksheet
+        Dim XlTemplate As Excel.Workbook
         xlAp = Globals.ThisAddIn.Application
         XlWb = xlAp.ActiveWorkbook
         XlSh = XlWb.ActiveSheet
@@ -80,8 +81,8 @@
         On Error Resume Next
         GetInfoSheet = XlWb.Worksheets("Info")
         On Error GoTo 0
-        If GetInfoSheet Is Nothing Then
-            xlAp.Workbooks(MacroName).Worksheets("Info").Copy(Before:=BillSheets(1))
+        If GetInfoSheet Is Nothing Then 'todo NB!! not complete. Not working
+            xlAp.Workbooks(BillMacrosTemplate).Worksheets("Info").Copy(Before:=BillSheets(1))
             GetInfoSheet = XlWb.Worksheets("Info")
             MsgBox("The Info sheet was created because it did not exist", vbOKOnly)
         End If
@@ -108,7 +109,7 @@
             GetBillTemplateSheet.Delete()
             On Error GoTo 0
             xlAp.DisplayAlerts = True
-            xlAp.Workbooks(MacroName).Worksheets("BillTemplate").Copy(Before:=BillSheets(1))
+            xlAp.Workbooks(BillMacrosTemplate).Worksheets("BillTemplate").Copy(Before:=BillSheets(1))
             GetBillTemplateSheet = XlWb.Worksheets("BillTemplate")
             MsgBox("The BillTemplate sheet was created because it did not exist or replaced because some of the named ranges do not exist", vbOKOnly)
         End If
@@ -136,7 +137,7 @@
             GetSumTemplateSheet.Delete()
             On Error GoTo 0
             xlAp.DisplayAlerts = True
-            xlAp.Workbooks(MacroName).Worksheets("SumTemplate").Copy(Before:=BillSheets(1))
+            xlAp.Workbooks(BillMacrosTemplate).Worksheets("SumTemplate").Copy(Before:=BillSheets(1))
             GetSumTemplateSheet = XlWb.Worksheets("SumTemplate")
             'Replace sheet references in formules with "SumTemplate"
             For Each Cell In GetSumTemplateSheet.Range("SumBillRow")
@@ -151,10 +152,12 @@
     Function CheckNamedRanges(BillSheets As Excel.Sheets, SheetName As String) As Boolean 'Returns false if some range names do not exist
         Dim Rname As Excel.Name
         Dim xlAp As Excel.Application
+        Dim XlWb As Excel.Workbook
         xlAp = Globals.ThisAddIn.Application
+        XlWb = xlAp.ActiveWorkbook
 
         CheckNamedRanges = True
-        For Each Rname In xlAp.Workbooks(MacroName).Worksheets(SheetName).Names
+        For Each Rname In XlWb.Worksheets(SheetName).Names
             On Error Resume Next 'Recreate the BillTemplate sheet if a named range does not exist
             If BillSheets(SheetName).Names(Rname.Name) Is Nothing Then
                 CheckNamedRanges = False
@@ -178,7 +181,7 @@
         GetSumSheet = BillSheets("Summary")
         On Error GoTo 0
         If GetSumSheet Is Nothing Then
-            xlAp.Workbooks(MacroName).Worksheets("Summary").Copy(After:=BillSheets(BillSheets.Count))
+            xlAp.Workbooks(BillMacrosTemplate).Worksheets("Summary").Copy(After:=BillSheets(BillSheets.Count))
             GetSumSheet = BillSheets(BillSheets.Count)
         End If
         GetSumSheet.Tab.Color = Drawing.Color.Green

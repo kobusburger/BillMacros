@@ -23,7 +23,7 @@
         FSSel.ShowDialog()
         If FSSel.DialogResult <> System.Windows.Forms.DialogResult.OK Then Return
 
-        LogTrackInfo("SetPageVS")
+        LogTrackInfo("SetPage")
         If FSSel.SelSheets.Checked = True Then
             BillSheets = xlAp.ActiveWindow.SelectedSheets
         Else

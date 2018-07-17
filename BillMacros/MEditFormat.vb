@@ -15,7 +15,7 @@
         FSSel.ShowDialog()
         If FSSel.DialogResult <> System.Windows.Forms.DialogResult.OK Then Return
 
-        LogTrackInfo("EditFormatVS")
+        LogTrackInfo("EditFormat")
         If FSSel.SelSheets.Checked = True Then
             BillSheets = xlAp.ActiveWindow.SelectedSheets
         Else

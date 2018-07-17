@@ -17,7 +17,7 @@
         SumSheet = GetSumSheet() 'Insert SumSheet if it does not exist
 
         With SumSheet
-            '        LogTrackInfo ("CreateSum")
+            LogTrackInfo("CreateSum")
             If .Columns(1).Find("BillGrpStart") Is Nothing Then
                 MsgBox("Cannot find BillGrpStart", vbCritical, "Excel Bill Functions")
                 Exit Sub

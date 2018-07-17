@@ -42,7 +42,7 @@
         XlWb = xlAp.ActiveWorkbook
         XlSh = XlWb.ActiveSheet
         FName = Left(XlWb.Name, (InStrRev(XlWb.Name, ".", -1, vbTextCompare) - 1))
-        If Not xlAp.Dialogs.xlDialogSaveAs.Show(FName & " Stripped") Then Exit Sub
+        If Not xlAp.Dialogs(Excel.XlBuiltInDialog.xlDialogSaveAs).Show(FName & " Stripped") Then Exit Sub
 
         For Each Wksht In XlWb.Worksheets
             Wksht.Visible = Excel.XlSheetVisibility.xlSheetVisible 'Worksheets must be visible to avoid errors
@@ -73,7 +73,7 @@
         XlSh = XlWb.ActiveSheet
         'Save bill with new name
         FName = Left(XlWb.Name, (InStrRev(XlWb.Name, ".", -1, vbTextCompare) - 1))
-        If Not xlAp.Dialogs.xlDialogSaveAs.Show(FName & " Priced") Then Exit Sub
+        If Not xlAp.Dialogs(Excel.XlBuiltInDialog.xlDialogSaveAs).Show(FName & " Priced") Then Exit Sub
 
         MaxRowNo = xlAp.Rows.Count
         MaxColNo = xlAp.Columns.Count
