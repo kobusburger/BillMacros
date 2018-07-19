@@ -76,29 +76,32 @@
         'Save bill with new name
         FName = Left(XlWb.Name, (InStrRev(XlWb.Name, ".", -1, vbTextCompare) - 1))
         If Not xlAp.Dialogs(Excel.XlBuiltInDialog.xlDialogSaveAs).Show(FName & " Priced") Then Exit Sub
-        MaxRowNo = xlAp.Rows.Count
-        MaxColNo = xlAp.Columns.Count
+        MaxRowNo = xlsh.UsedRange.Rows.Count
+        MaxColNo = XlSh.UsedRange.Count
+        xlAp.ScreenUpdating = False
         For Each Wksht In XlWb.Worksheets
             xlAp.StatusBar = "Sheet: " & Wksht.Name
-            xlAp.ScreenUpdating = False
             '           Wksht.Visible = Excel.XlSheetVisibility.xlSheetVisible 'Worksheets must be visible to avoid errors
             Select Case Wksht.Tab.Color
                 Case Excel.XlRgbColor.rgbRed 'Red = BillSheet
                     Wksht.UsedRange.Value = Wksht.UsedRange.Value 'Remove formulas
-                    Wksht.Columns(PricedAmtCol).Copy(Wksht.Columns(AmtCol))
-                    Wksht.Columns(PricedRateCol).Copy(Wksht.Columns(RateCol)) 'todo This is very slow
+                    Wksht.Range(Wksht.Cells(1, PricedAmtCol), Wksht.Cells(MaxRowNo, PricedAmtCol)).Copy()
+                    Wksht.Cells(1, AmtCol).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormulas, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=True, Transpose:=False)
+                    Wksht.Range(Wksht.Cells(1, PricedRateCol), Wksht.Cells(MaxRowNo, PricedRateCol)).Copy()
+                    Wksht.Cells(1, RateCol).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormulas, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=True, Transpose:=False)
                     DeleteXtraRowsCols(Wksht, "#BillEnd#", AmtCol)
                 Case Excel.XlRgbColor.rgbGreen 'Green = Summary
                     Wksht.UsedRange.Value = Wksht.UsedRange.Value 'Remove formulas
-                    Wksht.Columns(SumPricedAmtCol).Copy(Wksht.Columns(SumAmtCol))
+                    Wksht.Range(Wksht.Cells(1, SumPricedAmtCol), Wksht.Cells(MaxRowNo, SumPricedAmtCol)).Copy()
+                    Wksht.Cells(1, SumAmtCol).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormulas, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=True, Transpose:=False)
                     DeleteXtraRowsCols(Wksht, "#SumEnd#", SumAmtCol)
                 Case Else
                     xlAp.DisplayAlerts = False
                     Wksht.Delete()
                     xlAp.DisplayAlerts = True
             End Select
-            xlAp.ScreenUpdating = True
         Next
+        xlAp.ScreenUpdating = True
         xlAp.StatusBar = False
     End Sub
     Sub DeleteXtraRowsCols(Wksht As Excel.Worksheet, EndTxt As String, LastUsedCol As Integer)
@@ -107,8 +110,8 @@
         Dim MaxColNo As Long, RowNo As Long, TotRows As Long
         Dim xlAp As Excel.Application
         xlAp = Globals.ThisAddIn.Application
-        MaxRowNo = Wksht.Rows.Count
-        MaxColNo = Wksht.Columns.Count
+        MaxRowNo = Wksht.UsedRange.Rows.Count
+        MaxColNo = Wksht.UsedRange.Columns.Count
         Wksht.Select()
 
         If Not Wksht.Cells.Find(EndTxt, SearchOrder:=Excel.XlSearchOrder.xlByRows, SearchDirection:=Excel.XlSearchDirection.xlPrevious) Is Nothing Then
@@ -126,9 +129,10 @@
             Next
             xlAp.ActiveWindow.FreezePanes = False
             xlAp.ActiveWindow.Split = False
-            xlAp.ActiveWindow.ScrollRow = 1
-            xlAp.ActiveWindow.SplitRow = 4
-            xlAp.ActiveWindow.FreezePanes = True
+            'xlAp.ActiveWindow.Split = False
+            'xlAp.ActiveWindow.ScrollRow = 1
+            'xlAp.ActiveWindow.SplitRow = 4
+            'xlAp.ActiveWindow.FreezePanes = True
         End If
     End Sub
 
