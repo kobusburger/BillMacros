@@ -69,33 +69,33 @@
         Dim MaxRowNo As Integer, MaxColNo As Integer
         Dim xlAp As Excel.Application
         Dim XlWb As Excel.Workbook
-        Dim XlSh As Excel.Worksheet
         xlAp = Globals.ThisAddIn.Application
         XlWb = xlAp.ActiveWorkbook
-        XlSh = XlWb.ActiveSheet
         'Save bill with new name
         FName = Left(XlWb.Name, (InStrRev(XlWb.Name, ".", -1, vbTextCompare) - 1))
         If Not xlAp.Dialogs(Excel.XlBuiltInDialog.xlDialogSaveAs).Show(FName & " Priced") Then Exit Sub
-        MaxRowNo = xlsh.UsedRange.Rows.Count
-        MaxColNo = XlSh.UsedRange.Count
         xlAp.ScreenUpdating = False
-        For Each Wksht In XlWb.Worksheets
+        For Each Wksht In XlWb.Worksheets 'Do Summary (Green) first to preserve references to other sheets
             xlAp.StatusBar = "Sheet: " & Wksht.Name
-            '           Wksht.Visible = Excel.XlSheetVisibility.xlSheetVisible 'Worksheets must be visible to avoid errors
+            If Wksht.Tab.Color = Excel.XlRgbColor.rgbGreen Then
+                MaxRowNo = Wksht.UsedRange.Rows.Count + 2
+                MaxColNo = Wksht.UsedRange.Count + 2
+                Wksht.Range(Wksht.Cells(1, SumPricedAmtCol), Wksht.Cells(MaxRowNo, SumPricedAmtCol)).Copy()
+                Wksht.Cells(1, SumAmtCol).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteValues, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=True, Transpose:=False)
+                DeleteXtraRowsCols(Wksht, "#SumEnd#", SumAmtCol)
+            End If
+        Next
+        For Each Wksht In XlWb.Worksheets 'Do other sheets last
+            xlAp.StatusBar = "Sheet: " & Wksht.Name
             Select Case Wksht.Tab.Color
                 Case Excel.XlRgbColor.rgbRed 'Red = BillSheet
-                    Wksht.UsedRange.Value = Wksht.UsedRange.Value 'Remove formulas
-                    Wksht.Range(Wksht.Cells(1, PricedAmtCol), Wksht.Cells(MaxRowNo, PricedAmtCol)).Copy()
-                    Wksht.Cells(1, AmtCol).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormulas, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=True, Transpose:=False)
-                    Wksht.Range(Wksht.Cells(1, PricedRateCol), Wksht.Cells(MaxRowNo, PricedRateCol)).Copy()
-                    Wksht.Cells(1, RateCol).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormulas, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=True, Transpose:=False)
+                    MaxRowNo = Wksht.UsedRange.Rows.Count + 2
+                    MaxColNo = Wksht.UsedRange.Count + 2
+                    Wksht.Range(Wksht.Cells(1, PricedRateCol), Wksht.Cells(MaxRowNo, PricedAmtCol)).Copy()
+                    Wksht.Cells(1, RateCol).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteValues, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=True, Transpose:=False)
                     DeleteXtraRowsCols(Wksht, "#BillEnd#", AmtCol)
-                Case Excel.XlRgbColor.rgbGreen 'Green = Summary
-                    Wksht.UsedRange.Value = Wksht.UsedRange.Value 'Remove formulas
-                    Wksht.Range(Wksht.Cells(1, SumPricedAmtCol), Wksht.Cells(MaxRowNo, SumPricedAmtCol)).Copy()
-                    Wksht.Cells(1, SumAmtCol).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormulas, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=True, Transpose:=False)
-                    DeleteXtraRowsCols(Wksht, "#SumEnd#", SumAmtCol)
-                Case Else
+                Case Excel.XlRgbColor.rgbGreen 'Dummy for Green
+                Case Else 'Delete unused sheets
                     xlAp.DisplayAlerts = False
                     Wksht.Delete()
                     xlAp.DisplayAlerts = True
@@ -110,8 +110,8 @@
         Dim MaxColNo As Long, RowNo As Long, TotRows As Long
         Dim xlAp As Excel.Application
         xlAp = Globals.ThisAddIn.Application
-        MaxRowNo = Wksht.UsedRange.Rows.Count
-        MaxColNo = Wksht.UsedRange.Columns.Count
+        MaxRowNo = Wksht.UsedRange.Rows.Count + 2
+        MaxColNo = Wksht.UsedRange.Columns.Count + 2
         Wksht.Select()
 
         If Not Wksht.Cells.Find(EndTxt, SearchOrder:=Excel.XlSearchOrder.xlByRows, SearchDirection:=Excel.XlSearchDirection.xlPrevious) Is Nothing Then
