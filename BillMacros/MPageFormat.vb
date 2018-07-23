@@ -7,34 +7,25 @@
     Dim HdrInfo(3) As HdrInfoType '4 levels. The array index is the Hdr level starting at 0
     Dim NoShtItems As Integer    'Current No of non-empty items on the billsheet
     Dim HItNo As Integer 'Item no in the current hdr group
+    Dim xlAp As Excel.Application = Globals.ThisAddIn.Application
+    Dim XlWb As Excel.Workbook = xlAp.ActiveWorkbook
+    Dim XlSh As Excel.Worksheet = XlWb.ActiveSheet
+    Dim BillSheets As Excel.Sheets = XlWb.Worksheets
 
     Sub PageFormat()
         'On Error GoTo errHandler
-        Dim Wksht As Excel.Worksheet, BillSheets As Excel.Sheets, StartSht As Excel.Worksheet
+        Dim Wksht As Excel.Worksheet, StartSht As Excel.Worksheet
         Dim FSSel As New FSheetSel
-        Dim xlAp As Excel.Application
-        Dim XlWb As Excel.Workbook
-        Dim XlSh As Excel.Worksheet
-        xlAp = Globals.ThisAddIn.Application
-        XlWb = xlAp.ActiveWorkbook
-        XlSh = XlWb.ActiveSheet
         StartSht = XlSh
         ShowActivationNotice() 'Show activation warning window
         FSSel.Text = "Page Format"
         FSSel.ShowDialog()
         If FSSel.DialogResult <> System.Windows.Forms.DialogResult.OK Then Return
 
+        CheckTemplateSheet("BillTemplate") 'Check BillTemplate sheet and named ranges and insert/ replace if not correct
         LogTrackInfo("PageFormat")
-        If IsActivated() Then
-            If FSSel.SelSheets.Checked = True Then
-                BillSheets = xlAp.ActiveWindow.SelectedSheets
-            Else
-                BillSheets = XlWb.Worksheets
-            End If
-        Else
+        If FSSel.SelSheets.Checked = True Then
             BillSheets = xlAp.ActiveWindow.SelectedSheets
-            'The Add method for a collection add an object and for Sheets it adds a sheet to Excel.
-            'It seems that it is not possible to a Sheets collection seperate from Excel.
         End If
         FSSel.Dispose()
 
@@ -45,10 +36,11 @@
                 EditFormatSub(Wksht)
                 PageFormatSub(Wksht)
                 If NoShtItems > 0 Then
-                    Wksht.Tab.Color = Drawing.Color.Red
+                    Wksht.Tab.Color = Excel.XlRgbColor.rgbRed
                 Else
-                    Wksht.Tab.Color = Drawing.Color.Yellow
+                    Wksht.Tab.Color = Excel.XlRgbColor.rgbYellow
                 End If
+                If Not IsActivated() Then Exit For 'todo Changing Billsheets to a single sheet creates a runtime error
             End If
         Next
         StartSht.Select()
@@ -61,11 +53,9 @@
         '- Sets freeze panes
         Dim BillRow As Integer, EndBillRow As Integer
         Dim RowType As String
-        Dim BillTemplate As Excel.Worksheet
-        Dim xlAp As Excel.Application
-        xlAp = Globals.ThisAddIn.Application
-        BillTemplate = GetBillTemplateSheet()
+        Dim BillTemplate As Excel.Worksheet = XlWb.Worksheets("BillTemplate")
 
+        GetAllInfoPar() 'Put the page parameters on the Info sheet into BillInfoDict
         If CheckSheetType(Billsheet) = "#BillSheet#" Then
             xlAp.ScreenUpdating = False
             DeletePageBreaks(Billsheet)
@@ -82,6 +72,7 @@
                 Do While BillRow <= EndBillRow 'Use a Do While because a For Next loop can be endless if the end value is changed
                     xlAp.StatusBar = "PageFormat/ Sheet: " & Billsheet.Name & "/ Row:" & BillRow & " of " & EndBillRow
                     RowType = UCase(Trim(.Cells(BillRow, 1).value))
+                    '                    DebugLog(Billsheet, BillRow)
                     Select Case RowType
                         Case "ITEM", "ITEM1", "ITEM2", "ITEM3" 'ITEM, ITEM1, ITEM2 or ITEM2 only has an effect on the formatting
                             If ItemIsNotEmpty(Billsheet, BillRow) Then
@@ -143,7 +134,7 @@
                 .PageSetup.PrintArea = .Range(.Cells(1, 2), .Cells(EndBillRow + 2, 8)).Address
                 .Cells(1, 1).EntireColumn.Hidden = True
                 .PageSetup.PrintArea = .Range(.Cells(1, 2), .Cells(EndBillRow + 2, 8)).Address
-                .PageSetup.PrintTitleRows = GetInfoPar("PrintTitleRows")
+                If BillInfoDict.ContainsKey("PrintTitleRows") Then .PageSetup.PrintTitleRows = BillInfoDict("PrintTitleRows")
             End With
             InsertPageBreaks(Billsheet)
         End If
@@ -197,10 +188,7 @@
         Dim SumRowHeights As Single, i As Integer, InsertRowHeight As Single, PBRowHeight As Single
         Dim LastVisibleRow As Integer, LastBillRow As Integer
 
-        Dim BillTemplate As Excel.Worksheet
-        BillTemplate = GetBillTemplateSheet()
-        Dim xlAp As Excel.Application
-        xlAp = Globals.ThisAddIn.Application
+        Dim BillTemplate As Excel.Worksheet = XlWb.Worksheets("BillTemplate")
 
         With Billsheet
             'Initialise variables
@@ -292,8 +280,6 @@
         'This should be called for each new measured item
         'The relevant counters will be incremented depending in which group the item is
         Dim HdLv As Integer, i As Integer, PrHdrRow As Integer
-        Dim xlAp As Excel.Application
-        xlAp = Globals.ThisAddIn.Application
         NoShtItems = NoShtItems + 1
         HItNo = HItNo + 1
         PrHdrRow = xlAp.WorksheetFunction.Max(HdrInfo(0).PrevHdrRow, HdrInfo(1).PrevHdrRow, HdrInfo(2).PrevHdrRow, HdrInfo(3).PrevHdrRow)
@@ -317,11 +303,10 @@
         'Hide rows if the hdr group is not used
         'Keep higher level hdr group if a lower hdr group is used
         'This sub should be called for each hdr and at Billend
-        'todo Hdrs are not correctly hidden e.g. hdr2 are hidden with an empty group but the higher hdr1 is not hidden
         Dim i As Integer
         Select Case RowType
             Case "IHDR" 'H0 terminates groups H0, H1, H2 & H3 and starts new H0 group
-                If HdrInfo(0).NoHdrItems = 0 And HdrInfo(0).PrevHdrRow > 0 Then 'Empty group
+                If HdrInfo(0).NoHdrItems = 0 And HdrInfo(0).PrevHdrRow > 0 Then 'Empty group and not first IHDR
                     HideRows(Billsheet, HdrInfo(0).PrevHdrRow, BillRow - 1)
                 Else
                     HdrInfo(0).HNo = HdrInfo(0).HNo + 1
@@ -331,6 +316,7 @@
                 If HdrInfo(3).NoHdrItems = 0 Then HideRows(Billsheet, HdrInfo(3).PrevHdrRow, BillRow - 1)
                 SetHdrInfoToZero(1) 'Set higher levels to zero
                 HdrInfo(0).PrevHdrRow = BillRow
+                HdrInfo(0).NoHdrItems = 0 'Set item counter to zero
                 HItNo = 0
             Case "IHDR1" 'H1 terminates groups H1, H2 & H3 and starts new H1 group
                 If HdrInfo(1).NoHdrItems = 0 And HdrInfo(1).PrevHdrRow > 0 Then
@@ -341,6 +327,7 @@
                 If HdrInfo(2).NoHdrItems = 0 Then HideRows(Billsheet, HdrInfo(2).PrevHdrRow, BillRow - 1)
                 If HdrInfo(3).NoHdrItems = 0 Then HideRows(Billsheet, HdrInfo(3).PrevHdrRow, BillRow - 1)
                 SetHdrInfoToZero(2) 'Set higher levels to zero
+                HdrInfo(1).NoHdrItems = 0 'Set item counter to zero
                 HdrInfo(1).PrevHdrRow = BillRow
                 HItNo = 0
             Case "IHDR2" 'H2 starts new H2 group and terminate H2 & H3 groups
@@ -351,6 +338,7 @@
                 End If
                 If HdrInfo(3).NoHdrItems = 0 Then HideRows(Billsheet, HdrInfo(3).PrevHdrRow, BillRow - 1)
                 SetHdrInfoToZero(3) 'Set higher levels to zero
+                HdrInfo(2).NoHdrItems = 0 'Set item counter to zero
                 HdrInfo(2).PrevHdrRow = BillRow
                 HItNo = 0
             Case "IHDR3" 'H3 starts new H3 group and terminate H3 group
@@ -360,6 +348,7 @@
                     HdrInfo(3).HNo = HdrInfo(3).HNo + 1
                 End If
                 HdrInfo(3).PrevHdrRow = BillRow
+                HdrInfo(3).NoHdrItems = 0 'Set item counter to zero
                 HItNo = 0
             Case "#BILLEND#" 'BILLEND terminate all groups
                 For i = 0 To 3 'Check all the levels
@@ -393,8 +382,6 @@
         'Formulas that start with "=" are modified and copied
         Dim ColOffset As Integer, RowOffset As Integer
         Dim LoopCell As Excel.Range
-        Dim xlAp As Excel.Application
-        xlAp = Globals.ThisAddIn.Application
 
         xlAp.DisplayAlerts = False
         FromRange.Copy() 'Copy & paste formats
@@ -422,6 +409,14 @@
         ReplaceCounters = Replace(ReplaceCounters, "H3NO", HdrInfo(3).HNo, vbTextCompare)
         ReplaceCounters = Replace(ReplaceCounters, "HITNO", HItNo, vbTextCompare)
     End Function
-
-
+    Sub DebugLog(Wksh As Excel.Worksheet, Row As Integer)
+        Dim HL As Integer
+        Dim Col As Integer = 12
+        Wksh.Cells(Row, Col) = "HINo=" & HItNo
+        For HL = 0 To 3
+            Wksh.Cells(Row, Col + 1 + 3 * HL) = HL & "HNo=" & HdrInfo(HL).HNo
+            Wksh.Cells(Row, Col + 2 + 3 * HL) = HL & "INo=" & HdrInfo(HL).NoHdrItems
+            Wksh.Cells(Row, Col + 3 + 3 * HL) = HL & "PrH=" & HdrInfo(HL).PrevHdrRow
+        Next
+    End Sub
 End Module

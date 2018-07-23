@@ -1,14 +1,12 @@
 ﻿Module MEditFormat
+    Dim xlAp As Excel.Application = Globals.ThisAddIn.Application
+    Dim XlWb As Excel.Workbook = xlAp.ActiveWorkbook
+    Dim XlSh As Excel.Worksheet = XlWb.ActiveSheet
+    Dim BillSheets As Excel.Sheets = XlWb.Worksheets
     Sub EditFormat()
-        Dim Wksht As Excel.Worksheet, BillSheets As Excel.Sheets
+        Dim Wksht As Excel.Worksheet
         Dim ActShtName As String
         Dim FSSel As New FSheetSel
-        Dim xlAp As Excel.Application
-        Dim XlWb As Excel.Workbook
-        Dim XlSh As Excel.Worksheet
-        xlAp = Globals.ThisAddIn.Application
-        XlWb = xlAp.ActiveWorkbook
-        XlSh = XlWb.ActiveSheet
         ActShtName = XlSh.Name
         ShowActivationNotice() 'Show activation warning window
         FSSel.Text = "Edit Format"
@@ -18,8 +16,6 @@
         LogTrackInfo("EditFormat")
         If FSSel.SelSheets.Checked = True Then
             BillSheets = xlAp.ActiveWindow.SelectedSheets
-        Else
-            BillSheets = XlWb.Worksheets
         End If
         FSSel.Dispose()
 
@@ -37,8 +33,6 @@
         '- Removes page ends
         '- Deletes empty rows
         Dim BillRow As Integer, LastBillRow As Integer
-        Dim xlAp As Excel.Application
-        xlAp = Globals.ThisAddIn.Application
         If CheckSheetType(Billsheet) = "#BillSheet#" Then
             With Billsheet
                 xlAp.ScreenUpdating = False

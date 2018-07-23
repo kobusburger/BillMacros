@@ -16,10 +16,10 @@
     SumAmtCol As Integer = 4,
     SumPricedAmtCol As Integer = 5
 
-    Public Const BillMacrosTemplate As String = "BillMacrosTemplate.xlsx" 'todo impliment BillMacrosTemplate.xlsx
+    Public Const BillMacrosTemplate As String = "BillMacrosTemplate.xlsx"
     Const VerYear As Integer = 2018,
     VerMonth As Integer = 7,
-    VerDay As Integer = 20
+    VerDay As Integer = 23
 
     Const ActiveDays As Integer = 180 'The functionality will be reduced after the ActiveDays
 
@@ -79,7 +79,7 @@
 
     End Function
     Sub ShowActivationNotice()
-        'Show warning windows
+        'Show termination warning windows
         Dim TerminationDate As Date, RemainingDays As Integer
         TerminationDate = DateSerial(VerYear, VerMonth, VerDay + ActiveDays)
         RemainingDays = DateDiff("d", Date.Now, TerminationDate)
@@ -126,6 +126,4 @@
     '    e = Err.Number
     '    On Error GoTo 0
     'End Sub
-
-
 End Module

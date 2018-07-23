@@ -1,30 +1,28 @@
 ﻿Module MExportBills
+    Dim xlAp As Excel.Application = Globals.ThisAddIn.Application
+    Dim XlWb As Excel.Workbook = xlAp.ActiveWorkbook
+    Dim XlSh As Excel.Worksheet = XlWb.ActiveSheet
+    Dim BillSheets As Excel.Sheets = XlWb.Worksheets
     Sub CreatePDF()
         'Save-as blank PDF
         'Only works in Excel 2007 and later
 
         Dim Wksht As Excel.Worksheet, StartSht As Excel.Worksheet
         Dim result As Boolean, First As Boolean
-        Dim xlAp As Excel.Application
-        Dim XlWb As Excel.Workbook
-        Dim XlSh As Excel.Worksheet
-        xlAp = Globals.ThisAddIn.Application
-        XlWb = xlAp.ActiveWorkbook
-        XlSh = XlWb.ActiveSheet
 
         StartSht = XlSh
         ShowActivationNotice() 'Show activation warning window
         First = True
         For Each Wksht In XlWb.Worksheets
             Select Case Wksht.Tab.Color
-                Case Drawing.Color.Red 'Red = BillSheet
+                Case Excel.XlRgbColor.rgbRed 'Red = BillSheet
                     If First Then
                         Wksht.Select(True)
                         First = False
                     Else
                         Wksht.Select(False)
                     End If
-                Case Drawing.Color.Green 'Green = Summary
+                Case Excel.XlRgbColor.rgbGreen 'Green = Summary
                     Wksht.Select(False)
             End Select
         Next
@@ -35,12 +33,6 @@
         'Delete hidden rows, delete non-bill columns & delete non-bill sheets
         Dim Wksht As Excel.Worksheet, FName As String
         'Save bill with new name
-        Dim xlAp As Excel.Application
-        Dim XlWb As Excel.Workbook
-        Dim XlSh As Excel.Worksheet
-        xlAp = Globals.ThisAddIn.Application
-        XlWb = xlAp.ActiveWorkbook
-        XlSh = XlWb.ActiveSheet
         FName = Left(XlWb.Name, (InStrRev(XlWb.Name, ".", -1, vbTextCompare) - 1))
         If Not xlAp.Dialogs(Excel.XlBuiltInDialog.xlDialogSaveAs).Show(FName & " Stripped") Then Exit Sub
         For Each Wksht In XlWb.Worksheets
@@ -67,10 +59,6 @@
         'Delete hidden rows, delete non-bill columns, delete non-bill sheets & copy priced columns to bill
         Dim Wksht As Excel.Worksheet, FName As String
         Dim MaxRowNo As Integer, MaxColNo As Integer
-        Dim xlAp As Excel.Application
-        Dim XlWb As Excel.Workbook
-        xlAp = Globals.ThisAddIn.Application
-        XlWb = xlAp.ActiveWorkbook
         'Save bill with new name
         FName = Left(XlWb.Name, (InStrRev(XlWb.Name, ".", -1, vbTextCompare) - 1))
         If Not xlAp.Dialogs(Excel.XlBuiltInDialog.xlDialogSaveAs).Show(FName & " Priced") Then Exit Sub
@@ -108,8 +96,6 @@
         'Delete column A, delete rows below last used row, delete colums right of LastUsedCol & delete hidden rows
         Dim MaxRowNo As Long, LastUsedRow As Long
         Dim MaxColNo As Long, RowNo As Long, TotRows As Long
-        Dim xlAp As Excel.Application
-        xlAp = Globals.ThisAddIn.Application
         MaxRowNo = Wksht.UsedRange.Rows.Count + 2
         MaxColNo = Wksht.UsedRange.Columns.Count + 2
         Wksht.Select()

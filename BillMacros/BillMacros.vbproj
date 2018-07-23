@@ -34,7 +34,7 @@
     <PublishUrl>publish\</PublishUrl>
     <InstallUrl />
     <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.0.0.12</ApplicationVersion>
+    <ApplicationVersion>1.0.0.16</ApplicationVersion>
     <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateInterval>0</UpdateInterval>
@@ -214,20 +214,22 @@
     <Compile Include="MEditFormat.vb" />
     <Compile Include="MExportBills.vb" />
     <Compile Include="MGlobals.vb" />
-    <Compile Include="MPageFormat.vb" />
     <Compile Include="MSetupPage.vb" />
     <Compile Include="MActivation.vb" />
     <Compile Include="FSheetSel.Designer.vb">
       <DependentUpon>FSheetSel.vb</DependentUpon>
     </Compile>
-    <Compile Include="FSheetSel.vb">
+    <Content Include="FSheetSel.vb">
       <SubType>Form</SubType>
-    </Compile>
+    </Content>
     <Compile Include="ThisAddIn.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Content Include="BillMacrosTemplate.xlsx" />
+    <Content Include="BillMacrosTemplate.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="BillMacros_TemporaryKey.pfx" />
+    <Compile Include="MPageFormat.vb" />
     <None Include="ThisAddIn.Designer.xml">
       <DependentUpon>ThisAddIn.vb</DependentUpon>
     </None>
@@ -237,6 +239,7 @@
     <Compile Include="My Project\AssemblyInfo.vb" />
     <EmbeddedResource Include="FSheetSel.resx">
       <DependentUpon>FSheetSel.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

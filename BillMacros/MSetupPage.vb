@@ -1,20 +1,16 @@
 ﻿Module MSetupPage
     Dim LastPageNo As Integer
-    Dim BillInfoDict As New Dictionary(Of String, Object)
+    Public BillInfoDict As New Dictionary(Of String, Object)
+    Dim xlAp As Excel.Application = Globals.ThisAddIn.Application
+    Dim XlWb As Excel.Workbook = xlAp.ActiveWorkbook
+    Dim XlSh As Excel.Worksheet = XlWb.ActiveSheet
+    Dim BillSheets As Excel.Sheets = XlWb.Worksheets
     Sub SetPage()
         'Set info parameters for each sheet
         'Set the First Page Number for each sheet
-        Dim Wksht As Excel.Worksheet, BillSheets As Excel.Sheets 'Set freeze pane
+        Dim Wksht As Excel.Worksheet 'Set freeze pane
         Dim ActShtName As String
-        Dim xlAp As Excel.Application
-        Dim XlWb As Excel.Workbook
-        Dim XlSh As Excel.Worksheet
         Dim FSSel As New FSheetSel
-        xlAp = Globals.ThisAddIn.Application
-        XlWb = xlAp.ActiveWorkbook
-        XlSh = XlWb.ActiveSheet
-
-
 
         ActShtName = XlSh.Name
         ShowActivationNotice() 'Show activation warning window
@@ -26,13 +22,11 @@
         LogTrackInfo("SetPage")
         If FSSel.SelSheets.Checked = True Then
             BillSheets = xlAp.ActiveWindow.SelectedSheets
-        Else
-            BillSheets = XlWb.Worksheets
         End If
         FSSel.Dispose()
 
         xlAp.ScreenUpdating = False
-        GetInfoShtPar() 'Put the page parameters on the Info sheet into BillInfoDict
+        GetAllInfoPar() 'Put the page parameters on the Info sheet into BillInfoDict
         LastPageNo = 0
         If BillInfoDict.ContainsKey("FirstPageNumber") Then LastPageNo = BillInfoDict("FirstPageNumber") - 1
         For Each Wksht In BillSheets
@@ -57,8 +51,6 @@
     Sub SetPageSub(Billsheet As Excel.Worksheet)
         'Set the parameters for "page layout" according to the info sheet
         'Add reference for "Microsoft Scrupting Library Runtime
-        Dim xlAp As Excel.Application
-        xlAp = Globals.ThisAddIn.Application
 
         SetForcedPagePar(Billsheet) 'Set forced page parameters
 
@@ -89,8 +81,6 @@
     End Sub
     Sub SetForcedPagePar(Billsheet As Excel.Worksheet)
         'The parameters are forced so that Bill Macros can work as expected
-        Dim xlAp As Excel.Application
-        xlAp = Globals.ThisAddIn.Application
         With Billsheet.PageSetup
             xlAp.PrintCommunication = False
             .PrintTitleColumns = ""
@@ -108,18 +98,19 @@
             xlAp.PrintCommunication = True 'An error here refers to a problem in the previous lines
         End With
     End Sub
-    Sub GetInfoShtPar()
-        'Use Bill Info sheet and parameters if the sheet or parameters are avaialable
-        'Otherwise insert Bill Info sheet
+    Sub GetAllInfoPar()
+        'Insert all Info sheet parameters in BillInfoDict
+        'Create Info sheet if it does not exists
         Dim EndBillInfoRow As Integer, InfoRow As Integer
         Dim BillInfoSheet As Excel.Worksheet
 
-        BillInfoSheet = GetInfoSheet()
+        CheckTemplateSheet("Info") 'Check Info sheet and named ranges and insert/ replace if not correct
+        BillInfoSheet = XlWb.Worksheets("Info")
 
         'Get parameters from Bill Info sheet
         EndBillInfoRow = BillInfoSheet.Columns(1).Find("#EndBillInfo#").Row
         For InfoRow = 2 To EndBillInfoRow
-            If Len(BillInfoSheet.Cells(InfoRow, 1).value) > 3 Then '.Value is not recognised by VS because of late binding. VS does not know what type Cells(1,1) is.
+            If Len(BillInfoSheet.Cells(InfoRow, 1).value) > 3 Then 'todo .Value is not recognised by VS because of late binding. VS does not know what type Cells(1,1) is.
                 BillInfoDict(BillInfoSheet.Cells(InfoRow, 1).Value) = BillInfoSheet.Cells(InfoRow, 2).Value
             End If
         Next
