@@ -18,8 +18,8 @@
 
     Public Const BillMacrosTemplate As String = "BillMacrosTemplate.xlsx"
     Const VerYear As Integer = 2018,
-    VerMonth As Integer = 7,
-    VerDay As Integer = 23
+    VerMonth As Integer = 8,
+    VerDay As Integer = 2
 
     Const ActiveDays As Integer = 180 'The functionality will be reduced after the ActiveDays
 

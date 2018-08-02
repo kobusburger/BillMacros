@@ -1,15 +1,16 @@
 ﻿Module MExportBills
     Dim xlAp As Excel.Application = Globals.ThisAddIn.Application
-    Dim XlWb As Excel.Workbook = xlAp.ActiveWorkbook
-    Dim XlSh As Excel.Worksheet = XlWb.ActiveSheet
-    Dim BillSheets As Excel.Sheets = XlWb.Worksheets
+    Dim XlWb As Excel.Workbook
+    Dim XlSh As Excel.Worksheet
     Sub CreatePDF()
         'Save-as blank PDF
         'Only works in Excel 2007 and later
 
         Dim Wksht As Excel.Worksheet, StartSht As Excel.Worksheet
         Dim result As Boolean, First As Boolean
+        XlWb = xlAp.ActiveWorkbook
 
+        XlSh = XlWb.ActiveSheet
         StartSht = XlSh
         ShowActivationNotice() 'Show activation warning window
         First = True
@@ -32,6 +33,8 @@
     Sub CreateStripped()
         'Delete hidden rows, delete non-bill columns & delete non-bill sheets
         Dim Wksht As Excel.Worksheet, FName As String
+        XlWb = xlAp.ActiveWorkbook
+        XlSh = XlWb.ActiveSheet
         'Save bill with new name
         FName = Left(XlWb.Name, (InStrRev(XlWb.Name, ".", -1, vbTextCompare) - 1))
         If Not xlAp.Dialogs(Excel.XlBuiltInDialog.xlDialogSaveAs).Show(FName & " Stripped") Then Exit Sub
@@ -59,6 +62,8 @@
         'Delete hidden rows, delete non-bill columns, delete non-bill sheets & copy priced columns to bill
         Dim Wksht As Excel.Worksheet, FName As String
         Dim MaxRowNo As Integer, MaxColNo As Integer
+        XlWb = xlAp.ActiveWorkbook
+        XlSh = XlWb.ActiveSheet
         'Save bill with new name
         FName = Left(XlWb.Name, (InStrRev(XlWb.Name, ".", -1, vbTextCompare) - 1))
         If Not xlAp.Dialogs(Excel.XlBuiltInDialog.xlDialogSaveAs).Show(FName & " Priced") Then Exit Sub

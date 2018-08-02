@@ -1,14 +1,16 @@
 ﻿Module MCreateSum
     Dim xlAp As Excel.Application = Globals.ThisAddIn.Application
     Dim XlWb As Excel.Workbook = xlAp.ActiveWorkbook
-    Dim XlSh As Excel.Worksheet = XlWb.ActiveSheet
-    Dim BillSheets As Excel.Sheets = XlWb.Worksheets
+    Dim XlSh As Excel.Worksheet
+    Dim BillSheets As Excel.Sheets
     Sub CreateSum()
         'This sub creates a summary based on the billsheets and BillSheetTemplate sheet
         'A summary sheet is inserted if it does not exist
         Dim Wksht As Excel.Worksheet, SumSheet As Excel.Worksheet
         Dim SumRow As Integer
-
+        XlWb = xlAp.ActiveWorkbook
+        XlSh = XlWb.ActiveSheet
+        BillSheets = XlWb.Worksheets
         ShowActivationNotice() 'Show termination warning
 
         SumSheet = GetSumSheet() 'Insert SumSheet if it does not exist

@@ -1,8 +1,7 @@
 ﻿Module MBillSubs
     Dim xlAp As Excel.Application = Globals.ThisAddIn.Application
-    Dim XlWb As Excel.Workbook = xlAp.ActiveWorkbook
-    Dim XlSh As Excel.Worksheet = XlWb.ActiveSheet
-    Dim BillSheets As Excel.Sheets = XlWb.Worksheets
+    Dim XlWb As Excel.Workbook
+    Dim BillSheets As Excel.Sheets
     Function ItemIsNotEmpty(Billsheet As Excel.Worksheet, ItemRow As Integer) As Boolean
         ItemIsNotEmpty = False
         With Billsheet
@@ -109,7 +108,9 @@
         Dim Rangename As Excel.Name
         Dim TemplateWB As Excel.Workbook
         Dim TemplatePath As String = IO.Path.GetDirectoryName(Reflection.Assembly.GetExecutingAssembly.CodeBase)
+        xlAp.ScreenUpdating = False 'Stop screen updating so that the second workbook does not show
         TemplateWB = xlAp.Workbooks.Open(TemplatePath & "\" & BillMacrosTemplate)
+        'It is not possible to copy worksheet objects between excel instances, only between workbooks in the same instance
 
         CheckNamedRanges = True
         For Each Rangename In TemplateWB.Worksheets(SheetName).Names
@@ -121,6 +122,7 @@
             On Error GoTo 0
         Next
         TemplateWB.Close()
+        xlAp.ScreenUpdating = True
     End Function
     Function NamedRangeExists(Wksht As Excel.Worksheet, R As String) As Boolean
         'Returns true if the named range R exist on a Wksht
@@ -158,6 +160,8 @@
         'Update formula references to TemplateName
         Dim SumTemplateSheet As Excel.Worksheet
         Dim Cell As Excel.Range
+        XlWb = xlAp.ActiveWorkbook
+        BillSheets = XlWb.Worksheets
 
         On Error Resume Next
         SumTemplateSheet = XlWb.Worksheets(TemplateName)
@@ -187,7 +191,10 @@
         'Delete SheetName and copy template sheet from BillMacrosTemplate
         Dim TemplateWB As Excel.Workbook
         Dim TemplatePath As String = IO.Path.GetDirectoryName(Reflection.Assembly.GetExecutingAssembly.CodeBase)
+        xlAp.ScreenUpdating = False 'Stop screen updating so that the second workbook does not show
         TemplateWB = xlAp.Workbooks.Open(TemplatePath & "\" & BillMacrosTemplate, [ReadOnly]:=True)
+        'It is not possible to copy worksheet objects between excel instances, only between workbooks in the same instance
+        XlWb = xlAp.ActiveWorkbook
 
         On Error Resume Next
         xlAp.DisplayAlerts = False
@@ -206,5 +213,6 @@
         End If
         XlWb.Worksheets(SheetName).Tab.Color = ShtColor
         TemplateWB.Close()
+        xlAp.ScreenUpdating = True
     End Sub
 End Module

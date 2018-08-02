@@ -2,16 +2,18 @@
     Dim LastPageNo As Integer
     Public BillInfoDict As New Dictionary(Of String, Object)
     Dim xlAp As Excel.Application = Globals.ThisAddIn.Application
-    Dim XlWb As Excel.Workbook = xlAp.ActiveWorkbook
-    Dim XlSh As Excel.Worksheet = XlWb.ActiveSheet
-    Dim BillSheets As Excel.Sheets = XlWb.Worksheets
+    Dim XlWb As Excel.Workbook
+    Dim XlSh As Excel.Worksheet
+    Dim BillSheets As Excel.Sheets
     Sub SetPage()
         'Set info parameters for each sheet
         'Set the First Page Number for each sheet
         Dim Wksht As Excel.Worksheet 'Set freeze pane
         Dim ActShtName As String
         Dim FSSel As New FSheetSel
+        XlWb = xlAp.ActiveWorkbook
 
+        XlSh = XlWb.ActiveSheet
         ActShtName = XlSh.Name
         ShowActivationNotice() 'Show activation warning window
 
@@ -20,6 +22,8 @@
         If FSSel.DialogResult <> System.Windows.Forms.DialogResult.OK Then Return
 
         LogTrackInfo("SetPage")
+
+        BillSheets = XlWb.Worksheets
         If FSSel.SelSheets.Checked = True Then
             BillSheets = xlAp.ActiveWindow.SelectedSheets
         End If
@@ -103,6 +107,7 @@
         'Create Info sheet if it does not exists
         Dim EndBillInfoRow As Integer, InfoRow As Integer
         Dim BillInfoSheet As Excel.Worksheet
+        XlWb = xlAp.ActiveWorkbook
 
         CheckTemplateSheet("Info") 'Check Info sheet and named ranges and insert/ replace if not correct
         BillInfoSheet = XlWb.Worksheets("Info")

@@ -8,14 +8,16 @@
     Dim NoShtItems As Integer    'Current No of non-empty items on the billsheet
     Dim HItNo As Integer 'Item no in the current hdr group
     Dim xlAp As Excel.Application = Globals.ThisAddIn.Application
-    Dim XlWb As Excel.Workbook = xlAp.ActiveWorkbook
-    Dim XlSh As Excel.Worksheet = XlWb.ActiveSheet
-    Dim BillSheets As Excel.Sheets = XlWb.Worksheets
+    Dim XlWb As Excel.Workbook
+    Dim XlSh As Excel.Worksheet
+    Dim BillSheets As Excel.Sheets
 
     Sub PageFormat()
         'On Error GoTo errHandler
         Dim Wksht As Excel.Worksheet, StartSht As Excel.Worksheet
         Dim FSSel As New FSheetSel
+        XlWb = xlAp.ActiveWorkbook
+        XlSh = XlWb.ActiveSheet
         StartSht = XlSh
         ShowActivationNotice() 'Show activation warning window
         FSSel.Text = "Page Format"
@@ -24,6 +26,7 @@
 
         CheckTemplateSheet("BillTemplate") 'Check BillTemplate sheet and named ranges and insert/ replace if not correct
         LogTrackInfo("PageFormat")
+        BillSheets = XlWb.Worksheets
         If FSSel.SelSheets.Checked = True Then
             BillSheets = xlAp.ActiveWindow.SelectedSheets
         End If
@@ -53,6 +56,7 @@
         '- Sets freeze panes
         Dim BillRow As Integer, EndBillRow As Integer
         Dim RowType As String
+        XlWb = xlAp.ActiveWorkbook
         Dim BillTemplate As Excel.Worksheet = XlWb.Worksheets("BillTemplate")
 
         GetAllInfoPar() 'Put the page parameters on the Info sheet into BillInfoDict
