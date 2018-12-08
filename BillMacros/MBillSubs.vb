@@ -2,6 +2,7 @@
     Dim xlAp As Excel.Application = Globals.ThisAddIn.Application
     Dim XlWb As Excel.Workbook
     Dim BillSheets As Excel.Sheets
+    Dim XlSh As Excel.Worksheet
     Function ItemIsNotEmpty(Billsheet As Excel.Worksheet, ItemRow As Integer) As Boolean
         ItemIsNotEmpty = False
         With Billsheet
@@ -121,7 +122,7 @@
             End If
             On Error GoTo 0
         Next
-        TemplateWB.Close()
+        TemplateWB.Close(False)
         xlAp.ScreenUpdating = True
     End Function
     Function NamedRangeExists(Wksht As Excel.Worksheet, R As String) As Boolean
@@ -158,29 +159,29 @@
     Sub CheckTemplateSheet(TemplateName As String)
         'Search for TemplateName sheet and insert if it does not exist
         'Update formula references to TemplateName
-        Dim SumTemplateSheet As Excel.Worksheet
+        Dim TemplateSheet As Excel.Worksheet
         Dim Cell As Excel.Range
         XlWb = xlAp.ActiveWorkbook
         BillSheets = XlWb.Worksheets
 
         On Error Resume Next
-        SumTemplateSheet = XlWb.Worksheets(TemplateName)
+        TemplateSheet = XlWb.Worksheets(TemplateName)
         On Error GoTo 0
-        If SumTemplateSheet Is Nothing Then
+        If TemplateSheet Is Nothing Then
             CreateSheet(TemplateName, Excel.XlRgbColor.rgbBlue, False)
         ElseIf Not CheckNamedRanges(BillSheets, TemplateName) Then
             xlAp.DisplayAlerts = False
             On Error Resume Next
-            SumTemplateSheet.Delete()
+            TemplateSheet.Delete()
             On Error GoTo 0
             xlAp.DisplayAlerts = True
             CreateSheet(TemplateName, Excel.XlRgbColor.rgbBlue, False)
         End If
 
         'Replace sheet references in formules with TemplateName
-        SumTemplateSheet = XlWb.Worksheets(TemplateName)
+        TemplateSheet = XlWb.Worksheets(TemplateName)
         On Error Resume Next
-        For Each Cell In SumTemplateSheet.UsedRange.SpecialCells(Excel.XlCellType.xlCellTypeFormulas)
+        For Each Cell In TemplateSheet.UsedRange.SpecialCells(Excel.XlCellType.xlCellTypeFormulas)
             If Cell.HasFormula Then
                 Cell.Formula = ReplaceFormulaRefs(Cell.Formula, TemplateName & "!")
             End If
@@ -212,7 +213,36 @@
             TemplateWB.Worksheets(SheetName).Copy(before:=XlWb.Worksheets(1))
         End If
         XlWb.Worksheets(SheetName).Tab.Color = ShtColor
-        TemplateWB.Close()
+        TemplateWB.Close(False)
         xlAp.ScreenUpdating = True
     End Sub
+    Sub DeleteBlankRows()
+        'This function Deletes empty rows in the selected rows
+        Dim RangeRow As Integer, RowCount As Integer
+        Dim RowNo As Integer, LastUsedRow As Integer
+        Dim SelRows As Excel.Range
+        XlWb = xlAp.ActiveWorkbook
+        XlSh = XlWb.ActiveSheet
+        SelRows = xlAp.Selection
+        LastUsedRow = xlAp.ActiveCell.SpecialCells(Excel.XlCellType.xlCellTypeLastCell).Row
+        If LastUsedRow < SelRows(SelRows.Rows.Count).row Then
+            RowCount = LastUsedRow - SelRows(1).row + 1 'limit row range to last used cell
+        Else
+            RowCount = SelRows.Rows.Count
+        End If
+        RangeRow = 1
+        xlAp.ScreenUpdating = False
+        While RangeRow <= RowCount
+            RowNo = SelRows.Rows(RangeRow).row
+            If xlAp.WorksheetFunction.CountA(XlSh.rows(RowNo)) = 0 Then 'delete empty rows
+                XlSh.Rows(RowNo).entirerow.delete
+                RowCount = RowCount - 1
+            Else
+                RangeRow = RangeRow + 1
+            End If
+        End While
+
+        xlAp.ScreenUpdating = True
+    End Sub
+
 End Module

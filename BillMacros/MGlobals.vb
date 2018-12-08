@@ -18,10 +18,10 @@
 
     Public Const BillMacrosTemplate As String = "BillMacrosTemplate.xlsx"
     Const VerYear As Integer = 2018,
-    VerMonth As Integer = 8,
-    VerDay As Integer = 2
+    VerMonth As Integer = 12,
+    VerDay As Integer = 7
 
-    Const ActiveDays As Integer = 180 'The functionality will be reduced after the ActiveDays
+    Const ActiveDays As Integer = 360 'The functionality will be reduced after the ActiveDays
 
     Sub AboutBill()
         Dim Msg As String
