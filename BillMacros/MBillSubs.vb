@@ -195,7 +195,6 @@
         xlAp.ScreenUpdating = False 'Stop screen updating so that the second workbook does not show
         TemplateWB = xlAp.Workbooks.Open(TemplatePath & "\" & BillMacrosTemplate, [ReadOnly]:=True)
         'It is not possible to copy worksheet objects between excel instances, only between workbooks in the same instance
-        XlWb = xlAp.ActiveWorkbook
 
         On Error Resume Next
         xlAp.DisplayAlerts = False

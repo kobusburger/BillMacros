@@ -17,9 +17,9 @@
     SumPricedAmtCol As Integer = 5
 
     Public Const BillMacrosTemplate As String = "BillMacrosTemplate.xlsx"
-    Const VerYear As Integer = 2018,
-    VerMonth As Integer = 12,
-    VerDay As Integer = 7
+    Const VerYear As Integer = 2019,
+    VerMonth As Integer = 4,
+    VerDay As Integer = 5
 
     Const ActiveDays As Integer = 360 'The functionality will be reduced after the ActiveDays
 
@@ -33,8 +33,8 @@
     "Written by Kobus Burger © " & Left(VersionDate, 4) & vbCrLf &
     "083 228 9674 kobusgburger@gmail.com" & vbCrLf &
     vbCrLf & "Version date: " & VersionDate & vbCrLf &
-    "Termination date: " & TerminationDate & vbCrLf &
     "Note that activity is being logged for statistical purposes"
+        '    "Termination date: " & TerminationDate & vbCrLf &
 
         MsgBox(Msg, vbOKOnly, "Bill Macros")
     End Sub
@@ -53,7 +53,7 @@
         'https://docs.microsoft.com/en-us/dotnet/visual-basic/programming-guide/concepts/async/
 
         UserName = Environ$("Username")
-        FilePath = "\\aurecon.info\shares\ZAPTA\Admin\Admin\GAUZABLD\2 Modify\Building Electrical Electronic Services\Software\ExcelAddins\"
+        FilePath = "\\aurecon.info\shares\ZAPTA\Admin\Admin\GAUZABLD\SW\"
         FileName = "tracking.txt"
         DateTimeStr = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
         TrackText = DateTimeStr & vbTab &
@@ -68,14 +68,15 @@
     End Sub
     Function IsActivated() As Boolean
         'Return true if Bill Macros is activated
-        Dim TerminationDate As Date
-        TerminationDate = DateSerial(VerYear, VerMonth, VerDay + ActiveDays)
+        IsActivated = True
+        'Dim TerminationDate As Date
+        'TerminationDate = DateSerial(VerYear, VerMonth, VerDay + ActiveDays)
 
-        If DateDiff("d", Date.Now, TerminationDate) < 0 Then
-            IsActivated = False
-        Else
-            IsActivated = True
-        End If
+        'If DateDiff("d", Date.Now, TerminationDate) < 0 Then
+        '    IsActivated = False
+        'Else
+        '    IsActivated = True
+        'End If
 
     End Function
     Sub ShowActivationNotice()
