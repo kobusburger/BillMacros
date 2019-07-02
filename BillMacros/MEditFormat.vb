@@ -1,22 +1,18 @@
 ﻿Module MEditFormat
-    Dim xlAp As Excel.Application = Globals.ThisAddIn.Application
-    Dim XlWb As Excel.Workbook = xlAp.ActiveWorkbook
-    Dim XlSh As Excel.Worksheet
-    Dim BillSheets As Excel.Sheets
     Sub EditFormat()
         Dim Wksht As Excel.Worksheet
         Dim ActShtName As String
         Dim FSSel As New FSheetSel
-        XlWb = xlAp.ActiveWorkbook
-        XlSh = XlWb.ActiveSheet
-        ActShtName = XlSh.Name
+        xlWb = xlAp.ActiveWorkbook
+        xlSh = xlWb.ActiveSheet
+        ActShtName = xlSh.Name
         ShowActivationNotice() 'Show activation warning window
         FSSel.Text = "Edit Format"
         FSSel.ShowDialog()
         If FSSel.DialogResult <> System.Windows.Forms.DialogResult.OK Then Return
 
         LogTrackInfo("EditFormat")
-        BillSheets = XlWb.Worksheets
+        BillSheets = xlWb.Worksheets
         If FSSel.SelSheets.Checked = True Then
             BillSheets = xlAp.ActiveWindow.SelectedSheets
         End If
@@ -28,7 +24,7 @@
                 EditFormatSub(Wksht)
             End If
         Next
-        XlWb.Sheets(ActShtName).Select
+        xlWb.Sheets(ActShtName).Select
     End Sub
     Sub EditFormatSub(Billsheet As Excel.Worksheet)
         'This function does the following:

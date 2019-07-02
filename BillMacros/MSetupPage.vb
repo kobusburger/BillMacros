@@ -1,20 +1,16 @@
 ﻿Module MSetupPage
     Dim LastPageNo As Integer
     Public BillInfoDict As New Dictionary(Of String, Object)
-    Dim xlAp As Excel.Application = Globals.ThisAddIn.Application
-    Dim XlWb As Excel.Workbook
-    Dim XlSh As Excel.Worksheet
-    Dim BillSheets As Excel.Sheets
     Sub SetPage()
         'Set info parameters for each sheet
         'Set the First Page Number for each sheet
         Dim Wksht As Excel.Worksheet 'Set freeze pane
         Dim ActShtName As String
         Dim FSSel As New FSheetSel
-        XlWb = xlAp.ActiveWorkbook
+        xlWb = xlAp.ActiveWorkbook
 
-        XlSh = XlWb.ActiveSheet
-        ActShtName = XlSh.Name
+        xlSh = xlWb.ActiveSheet
+        ActShtName = xlSh.Name
         ShowActivationNotice() 'Show activation warning window
 
         FSSel.Text = "Setup page"
@@ -23,7 +19,7 @@
 
         LogTrackInfo("SetPage")
 
-        BillSheets = XlWb.Worksheets
+        BillSheets = xlWb.Worksheets
         If FSSel.SelSheets.Checked = True Then
             BillSheets = xlAp.ActiveWindow.SelectedSheets
         End If
@@ -50,7 +46,7 @@
         Next
         xlAp.ScreenUpdating = True
         xlAp.StatusBar = False
-        XlWb.Sheets(ActShtName).Select
+        xlWb.Sheets(ActShtName).Select
     End Sub
     Sub SetPageSub(Billsheet As Excel.Worksheet)
         'Set the parameters for "page layout" according to the info sheet

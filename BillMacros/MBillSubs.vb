@@ -1,8 +1,4 @@
 ﻿Module MBillSubs
-    Dim xlAp As Excel.Application = Globals.ThisAddIn.Application
-    Dim XlWb As Excel.Workbook
-    Dim BillSheets As Excel.Sheets
-    Dim XlSh As Excel.Worksheet
     Function ItemIsNotEmpty(Billsheet As Excel.Worksheet, ItemRow As Integer) As Boolean
         ItemIsNotEmpty = False
         With Billsheet
@@ -193,12 +189,12 @@
         Dim TemplateWB As Excel.Workbook
         Dim TemplatePath As String = IO.Path.GetDirectoryName(Reflection.Assembly.GetExecutingAssembly.CodeBase)
         xlAp.ScreenUpdating = False 'Stop screen updating so that the second workbook does not show
-        TemplateWB = xlAp.Workbooks.Open(TemplatePath & "\" & BillMacrosTemplate, [ReadOnly]:=True)
         'It is not possible to copy worksheet objects between excel instances, only between workbooks in the same instance
 
         On Error Resume Next
+        xlWb = xlAp.ActiveWorkbook
         xlAp.DisplayAlerts = False
-        XlWb.Worksheets(SheetName).Delete()
+        xlWb.Worksheets(SheetName).Delete()
         xlAp.DisplayAlerts = True
         If Err.Number > 0 Then 'SheetName did not exist
             MsgBox(SheetName & " sheet was created", vbOKOnly)
@@ -206,8 +202,9 @@
             MsgBox(SheetName & " sheet was recreated because it was not correct", vbOKOnly)
         End If
         On Error GoTo 0
+        TemplateWB = xlAp.Workbooks.Open(TemplatePath & "\" & BillMacrosTemplate, [ReadOnly]:=True)
         If AfterEnd = True Then 'Copy to last worksheet position
-            TemplateWB.Worksheets(SheetName).Copy(After:=XlWb.Worksheets(XlWb.Worksheets.Count))
+            TemplateWB.Worksheets(SheetName).Copy(After:=xlWb.Worksheets(xlWb.Worksheets.Count))
         Else 'Copy to first worksheet position
             TemplateWB.Worksheets(SheetName).Copy(before:=XlWb.Worksheets(1))
         End If

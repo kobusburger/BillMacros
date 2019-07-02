@@ -7,10 +7,6 @@
     Dim HdrInfo(3) As HdrInfoType '4 levels. The array index is the Hdr level starting at 0
     Dim NoShtItems As Integer    'Current No of non-empty items on the billsheet
     Dim HItNo As Integer 'Item no in the current hdr group
-    Dim xlAp As Excel.Application = Globals.ThisAddIn.Application
-    Dim XlWb As Excel.Workbook
-    Dim XlSh As Excel.Worksheet
-    Dim BillSheets As Excel.Sheets
 
     Sub PageFormat()
         'On Error GoTo errHandler

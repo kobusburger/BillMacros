@@ -1,20 +1,17 @@
 ﻿Module MExportBills
-    Dim xlAp As Excel.Application = Globals.ThisAddIn.Application
-    Dim XlWb As Excel.Workbook
-    Dim XlSh As Excel.Worksheet
     Sub CreatePDF()
         'Save-as blank PDF
         'Only works in Excel 2007 and later
 
         Dim Wksht As Excel.Worksheet, StartSht As Excel.Worksheet
         Dim result As Boolean, First As Boolean
-        XlWb = xlAp.ActiveWorkbook
+        xlWb = xlAp.ActiveWorkbook
 
-        XlSh = XlWb.ActiveSheet
-        StartSht = XlSh
+        xlSh = xlWb.ActiveSheet
+        StartSht = xlSh
         ShowActivationNotice() 'Show activation warning window
         First = True
-        For Each Wksht In XlWb.Worksheets
+        For Each Wksht In xlWb.Worksheets
             Select Case Wksht.Tab.Color
                 Case Excel.XlRgbColor.rgbRed 'Red = BillSheet
                     If First Then
