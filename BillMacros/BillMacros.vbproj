@@ -34,7 +34,7 @@
     <PublishUrl>Publish\</PublishUrl>
     <InstallUrl />
     <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.0.0.28</ApplicationVersion>
+    <ApplicationVersion>1.0.0.33</ApplicationVersion>
     <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateInterval>0</UpdateInterval>
@@ -142,6 +142,7 @@
     <Reference Include="Accessibility" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -287,7 +288,7 @@
     <ManifestKeyFile>BillMacros_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>C992EF4ADBE4C468EA1C376CF069319E6A8C89A1</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>FAA955A80429CFB0D5BF2D31F23BDB2C14C3AEE6</ManifestCertificateThumbprint>
   </PropertyGroup>
   <!-- Include the build rules for a Visual Basic project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

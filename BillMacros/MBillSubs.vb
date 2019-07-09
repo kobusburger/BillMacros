@@ -135,11 +135,12 @@
         'Add VBA reference to "Microsoft VBScript Regular Expressions 5.5"
         'The following FormulaText can be used to test this function
         '='tt'!CAR&tt!E3&" ""X"" "&'[Bill macros.xla]BillTemplate'!$G$23 &" &'YY' "&'12 00'!G3&" "&'C:\Users\gert.brits\Documents\Bill of Quantities\[Bill macros.xla]BillTemplate'!$K$1
+        'The syntax of a reference is "'path[workbookname]sheetname'!reference" but some references are not enclosed in singel quotes
 
         'todo #REF creates a runtime error
 
         Dim regexpattern As String
-        regexpattern = "['a-zA-Z0-9\s\[\]\.:\\]+!"
+        regexpattern = "['_a-zA-Z0-9\s\[\]\.:\\]+!" '"'(.*?)'" does not work because it only catches references in single quotes
         Dim re As New System.Text.RegularExpressions.Regex(regexpattern)
 
         'Return all allowed charactors before "!" including "!"
@@ -157,11 +158,11 @@
         'Update formula references to TemplateName
         Dim TemplateSheet As Excel.Worksheet
         Dim Cell As Excel.Range
-        XlWb = xlAp.ActiveWorkbook
-        BillSheets = XlWb.Worksheets
+        xlWb = xlAp.ActiveWorkbook
+        BillSheets = xlWb.Worksheets
 
         On Error Resume Next
-        TemplateSheet = XlWb.Worksheets(TemplateName)
+        TemplateSheet = xlWb.Worksheets(TemplateName)
         On Error GoTo 0
         If TemplateSheet Is Nothing Then
             CreateSheet(TemplateName, Excel.XlRgbColor.rgbBlue, False)
@@ -175,7 +176,7 @@
         End If
 
         'Replace sheet references in formules with TemplateName
-        TemplateSheet = XlWb.Worksheets(TemplateName)
+        TemplateSheet = xlWb.Worksheets(TemplateName)
         On Error Resume Next
         For Each Cell In TemplateSheet.UsedRange.SpecialCells(Excel.XlCellType.xlCellTypeFormulas)
             If Cell.HasFormula Then

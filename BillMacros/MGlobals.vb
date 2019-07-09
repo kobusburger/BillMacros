@@ -18,8 +18,8 @@
 
     Public Const BillMacrosTemplate As String = "BillMacrosTemplate.xlsx"
     Const VerYear As Integer = 2019,
-    VerMonth As Integer = 6,
-    VerDay As Integer = 12
+    VerMonth As Integer = 7,
+    VerDay As Integer = 9
 
     Const ActiveDays As Integer = 360 'The functionality will be reduced after the ActiveDays
 
@@ -33,12 +33,19 @@
         Dim Msg As String
         Dim TerminationDate As Date
         Dim VersionDate As String
+        Dim PublishVersion As String
         VersionDate = VerYear & VerMonth.ToString("-00-") & VerDay.ToString("00")
         TerminationDate = DateSerial(VerYear, VerMonth, VerDay + ActiveDays)
+        If System.Deployment.Application.ApplicationDeployment.IsNetworkDeployed Then
+            PublishVersion = System.Deployment.Application.ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString
+        Else
+            PublishVersion = ""
+        End If
         Msg = "The bill functions assist with the formatting of bills" & vbCrLf & vbCrLf &
     "Written by Kobus Burger © " & Left(VersionDate, 4) & vbCrLf &
     "083 228 9674 kobusgburger@gmail.com" & vbCrLf &
-    vbCrLf & "Version date: " & VersionDate & vbCrLf
+    vbCrLf & "Version date: " & VersionDate & vbCrLf &
+    "Published version: " & PublishVersion
         '"Note that activity is being logged for statistical purposes"
         '    "Termination date: " & TerminationDate & vbCrLf &
 
