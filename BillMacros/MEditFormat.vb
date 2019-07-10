@@ -3,6 +3,7 @@
         Dim Wksht As Excel.Worksheet
         Dim ActShtName As String
         Dim FSSel As New FSheetSel
+        Dim BillSheets As Excel.Sheets
         xlWb = xlAp.ActiveWorkbook
         xlSh = xlWb.ActiveSheet
         ActShtName = xlSh.Name
@@ -39,6 +40,7 @@
                 BillRow = 1
                 Do While BillRow <= LastBillRow 'Use a Do While because a For Next loop can be endless if the end value is changed
                     xlAp.StatusBar = "EditFormat/ Sheet: " & Billsheet.Name & "/ Row:" & BillRow & " of " & LastBillRow
+                    If BillRow Mod 10 = 0 Then Windows.Forms.Application.DoEvents() 'DoEvents was added to avoid RuntimeCallableWrapper failed error
                     Select Case UCase(Trim(.Cells(BillRow, 1).value))
                         Case "PB"
                             .Rows(BillRow).Delete

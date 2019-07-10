@@ -4,6 +4,7 @@
         'A summary sheet is inserted if it does not exist
         Dim Wksht As Excel.Worksheet, SumSheet As Excel.Worksheet
         Dim SumRow As Integer
+        Dim BillSheets As Excel.Sheets
         xlWb = xlAp.ActiveWorkbook
         xlSh = xlWb.ActiveSheet
         BillSheets = xlWb.Worksheets
@@ -59,6 +60,8 @@
         'Search for "Summary" sheet and insert if it does not exist or if it is not correct
         '        Dim Wksht As Excel.Worksheet
 
+        Dim BillSheets As Excel.Sheets
+        BillSheets = xlWb.Worksheets
         On Error Resume Next
         GetSumSheet = BillSheets("Summary")
         On Error GoTo 0

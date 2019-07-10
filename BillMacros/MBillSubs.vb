@@ -158,6 +158,7 @@
         'Update formula references to TemplateName
         Dim TemplateSheet As Excel.Worksheet
         Dim Cell As Excel.Range
+        Dim BillSheets As Excel.Sheets
         xlWb = xlAp.ActiveWorkbook
         BillSheets = xlWb.Worksheets
 

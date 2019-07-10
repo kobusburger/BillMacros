@@ -7,6 +7,7 @@
         Dim Wksht As Excel.Worksheet 'Set freeze pane
         Dim ActShtName As String
         Dim FSSel As New FSheetSel
+        Dim BillSheets As Excel.Sheets
         xlWb = xlAp.ActiveWorkbook
 
         xlSh = xlWb.ActiveSheet

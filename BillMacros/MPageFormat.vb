@@ -12,8 +12,9 @@
         'On Error GoTo errHandler
         Dim Wksht As Excel.Worksheet, StartSht As Excel.Worksheet
         Dim FSSel As New FSheetSel
-        XlWb = xlAp.ActiveWorkbook
-        XlSh = XlWb.ActiveSheet
+        Dim BillSheets As Excel.Sheets
+        xlWb = xlAp.ActiveWorkbook
+        xlSh = XlWb.ActiveSheet
         StartSht = XlSh
         ShowActivationNotice() 'Show activation warning window
         FSSel.Text = "Page Format"
@@ -71,6 +72,7 @@
                 BillRow = 1
                 Do While BillRow <= EndBillRow 'Use a Do While because a For Next loop can be endless if the end value is changed
                     xlAp.StatusBar = "PageFormat/ Sheet: " & Billsheet.Name & "/ Row:" & BillRow & " of " & EndBillRow
+                    If BillRow Mod 10 = 0 Then Windows.Forms.Application.DoEvents() 'DoEvents was added to avoid RuntimeCallableWrapper failed error
                     RowType = UCase(Trim(.Cells(BillRow, 1).value))
                     '                    DebugLog(Billsheet, BillRow)
                     Select Case RowType
@@ -213,6 +215,7 @@
 
             While BreakNo <= TotalPageBreaks And BreakNo < MaxPages
                 xlAp.StatusBar = "InsertPageBreaks/ Sheet: " & Billsheet.Name & "/ Break No:" & BreakNo & " of " & TotalPageBreaks
+                If BreakNo Mod 10 = 0 Then Windows.Forms.Application.DoEvents() 'DoEvents was added to avoid RuntimeCallableWrapper failed error
                 BreakLine = .HPageBreaks.Item(BreakNo).Location.Row
                 SumRowHeights = 0
                 'Decrement BreakLine until the sum of row heights is larger than the PB row height

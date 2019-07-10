@@ -27,7 +27,6 @@
     Public xlAp As Excel.Application = Globals.ThisAddIn.Application
     Public xlWb As Excel.Workbook
     Public xlSh As Excel.Worksheet
-    Public BillSheets As Excel.Sheets
 
     Sub AboutBill()
         Dim Msg As String
