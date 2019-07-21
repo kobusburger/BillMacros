@@ -17,9 +17,9 @@
     SumPricedAmtCol As Integer = 5
 
     Public Const BillMacrosTemplate As String = "BillMacrosTemplate.xlsx"
-    Const VerYear As Integer = 2019,
-    VerMonth As Integer = 7,
-    VerDay As Integer = 9
+    'Const VerYear As Integer = 2019,
+    'VerMonth As Integer = 7,
+    'VerDay As Integer = 9
 
     Const ActiveDays As Integer = 360 'The functionality will be reduced after the ActiveDays
 
@@ -31,20 +31,24 @@
     Sub AboutBill()
         Dim Msg As String
         Dim TerminationDate As Date
-        Dim VersionDate As String
         Dim PublishVersion As String
-        VersionDate = VerYear & VerMonth.ToString("-00-") & VerDay.ToString("00")
-        TerminationDate = DateSerial(VerYear, VerMonth, VerDay + ActiveDays)
+        Dim AssemblyVersion As System.Version
+        Dim VersionDate As New Date(2000, 1, 1)
+        TerminationDate = VersionDate.AddDays(ActiveDays)
         If System.Deployment.Application.ApplicationDeployment.IsNetworkDeployed Then
             PublishVersion = System.Deployment.Application.ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString
         Else
             PublishVersion = ""
         End If
+        AssemblyVersion = System.Reflection.Assembly.GetExecutingAssembly.GetName.Version
+        VersionDate = VersionDate.AddDays(AssemblyVersion.Build)
+        VersionDate = VersionDate.AddSeconds(AssemblyVersion.Revision * 2)
         Msg = "The bill functions assist with the formatting of bills" & vbCrLf & vbCrLf &
-    "Written by Kobus Burger © " & Left(VersionDate, 4) & vbCrLf &
-    "083 228 9674 kobusgburger@gmail.com" & vbCrLf &
-    vbCrLf & "Version date: " & VersionDate & vbCrLf &
-    "Published version: " & PublishVersion
+            "Written by Kobus Burger © " & VersionDate.Year & vbCrLf &
+            "083 228 9674 kobusgburger@gmail.com" & vbCrLf &
+            vbCrLf & "Version date: " & VersionDate.ToString("yyyy-MM-dd HH:mm:ss") & vbCrLf &
+            "Version: " & AssemblyVersion.ToString & vbCrLf &
+            "Published version: " & PublishVersion
         '"Note that activity is being logged for statistical purposes"
         '    "Termination date: " & TerminationDate & vbCrLf &
 
@@ -94,7 +98,12 @@
     Sub ShowActivationNotice()
         'Show termination warning windows
         Dim TerminationDate As Date, RemainingDays As Integer
-        TerminationDate = DateSerial(VerYear, VerMonth, VerDay + ActiveDays)
+        Dim AssemblyVersion As System.Version
+        Dim VersionDate As New Date(2000, 1, 1)
+        AssemblyVersion = System.Reflection.Assembly.GetExecutingAssembly.GetName.Version
+        VersionDate = VersionDate.AddDays(AssemblyVersion.Build)
+        VersionDate = VersionDate.AddSeconds(AssemblyVersion.Revision * 2)
+        TerminationDate = VersionDate.AddDays(ActiveDays)
         RemainingDays = DateDiff("d", Date.Now, TerminationDate)
 
         Select Case RemainingDays
