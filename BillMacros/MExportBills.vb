@@ -23,6 +23,7 @@
                 Case Excel.XlRgbColor.rgbGreen 'Green = Summary
                     Wksht.Select(False)
             End Select
+            Windows.Forms.Application.DoEvents()
         Next
         result = xlAp.Dialogs.xlDialogSaveAs.Show(, 57) 'pdf type_num = 57
         StartSht.Select()
@@ -41,10 +42,16 @@
             '            Wksht.Visible = Excel.XlSheetVisibility.xlSheetVisible 'Worksheets must be visible to avoid errors
             Select Case Wksht.Tab.Color
                 Case Excel.XlRgbColor.rgbRed 'Red = BillSheet
-                    Wksht.UsedRange.Value = Wksht.UsedRange.Value 'Remove formulas
+                    ' Wksht.UsedRange.Value = Wksht.UsedRange.Value 'Remove formulas but this does not work with text that looks like dates
+                    Wksht.UsedRange.Copy()
+                    Wksht.UsedRange.PasteSpecial(Paste:=Excel.XlPasteType.xlPasteValues,
+                    Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=False)
                     DeleteXtraRowsCols(Wksht, "#BillEnd#", AmtCol)
                 Case Excel.XlRgbColor.rgbGreen 'Green = Summary
-                    Wksht.UsedRange.Value = Wksht.UsedRange.Value 'Remove formulas
+                    ' Wksht.UsedRange.Value = Wksht.UsedRange.Value 'Remove formulas but this does not work with text that looks like dates
+                    Wksht.UsedRange.Copy()
+                    Wksht.UsedRange.PasteSpecial(Paste:=Excel.XlPasteType.xlPasteValues,
+                    Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=False)
                     DeleteXtraRowsCols(Wksht, "#SumEnd#", SumAmtCol)
                 Case Else
                     xlAp.DisplayAlerts = False
@@ -52,6 +59,7 @@
                     xlAp.DisplayAlerts = True
             End Select
             xlAp.ScreenUpdating = True
+            Windows.Forms.Application.DoEvents()
         Next
         xlAp.StatusBar = False
     End Sub
@@ -68,17 +76,26 @@
         For Each Wksht In XlWb.Worksheets 'Do Summary (Green) first to preserve references to other sheets
             xlAp.StatusBar = "Sheet: " & Wksht.Name
             If Wksht.Tab.Color = Excel.XlRgbColor.rgbGreen Then
+                ' Wksht.UsedRange.Value = Wksht.UsedRange.Value 'Remove formulas but this does not work with text that looks like dates
+                Wksht.UsedRange.Copy()
+                Wksht.UsedRange.PasteSpecial(Paste:=Excel.XlPasteType.xlPasteValues,
+                    Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=False)
                 MaxRowNo = Wksht.UsedRange.Rows.Count + 2
                 MaxColNo = Wksht.UsedRange.Count + 2
                 Wksht.Range(Wksht.Cells(1, SumPricedAmtCol), Wksht.Cells(MaxRowNo, SumPricedAmtCol)).Copy()
                 Wksht.Cells(1, SumAmtCol).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteValues, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=True, Transpose:=False)
                 DeleteXtraRowsCols(Wksht, "#SumEnd#", SumAmtCol)
             End If
+            Windows.Forms.Application.DoEvents()
         Next
         For Each Wksht In XlWb.Worksheets 'Do other sheets last
             xlAp.StatusBar = "Sheet: " & Wksht.Name
             Select Case Wksht.Tab.Color
                 Case Excel.XlRgbColor.rgbRed 'Red = BillSheet
+                    ' Wksht.UsedRange.Value = Wksht.UsedRange.Value 'Remove formulas but this does not work with text that looks like dates
+                    Wksht.UsedRange.Copy()
+                    Wksht.UsedRange.PasteSpecial(Paste:=Excel.XlPasteType.xlPasteValues,
+                    Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=False)
                     MaxRowNo = Wksht.UsedRange.Rows.Count + 2
                     MaxColNo = Wksht.UsedRange.Count + 2
                     Wksht.Range(Wksht.Cells(1, PricedRateCol), Wksht.Cells(MaxRowNo, PricedAmtCol)).Copy()
@@ -90,6 +107,7 @@
                     Wksht.Delete()
                     xlAp.DisplayAlerts = True
             End Select
+            Windows.Forms.Application.DoEvents()
         Next
         xlAp.ScreenUpdating = True
         xlAp.StatusBar = False
