@@ -397,7 +397,9 @@
                 LoopCell.Copy()
                 ToRange.Offset(RowOffset, ColOffset).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormulas, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=False)
                 ToRange.Offset(RowOffset, ColOffset).Formula = ReplaceCounters(ToRange.Offset(RowOffset, ColOffset).Formula)
-                ToRange.Offset(RowOffset, ColOffset).Formula = ReplaceFormulaRefs(ToRange.Offset(RowOffset, ColOffset).Formula, "'" & Billsheet.Name & "'!")
+                If TypeOf ToRange.Offset(RowOffset, ColOffset).Value IsNot Int32 Then 'Only replace formulas in error free cells
+                    ToRange.Offset(RowOffset, ColOffset).Formula = ReplaceFormulaRefs(ToRange.Offset(RowOffset, ColOffset).Formula, "'" & Billsheet.Name & "'!")
+                End If
             End If
         Next
         xlAp.DisplayAlerts = True

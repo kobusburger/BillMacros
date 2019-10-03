@@ -51,7 +51,9 @@
         NewSumBillRow = SumSheet.Range(SumSheet.Cells(SumRow, 1), SumSheet.Cells(SumRow, 1).Offset(SumBillRowRows - 1, SumBillRowCols - 1))
         For Each Cell In NewSumBillRow
             If Cell.HasFormula Then
-                Cell.Formula = ReplaceFormulaRefs(Cell.Formula, "'" & Wksht.Name & "'!")
+                If TypeOf Cell.Value IsNot Int32 Then 'Only replace formulas in error free cells
+                    Cell.Formula = ReplaceFormulaRefs(Cell.Formula, "'" & Wksht.Name & "'!")
+                End If
             End If
         Next
         NewSumBillRow.Copy(Destination:=SumSheet.Cells(SumRow, 1))
@@ -72,5 +74,6 @@
             CreateSheet("Summary", Excel.XlRgbColor.rgbGreen, True) 'There is a problem with it
         End If
         GetSumSheet = BillSheets("Summary")
+        GetSumSheet.Tab.Color = Excel.XlRgbColor.rgbGreen 'Confirm the tab color
     End Function
 End Module

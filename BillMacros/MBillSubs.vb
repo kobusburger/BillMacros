@@ -127,8 +127,8 @@
         Dim TestR As Excel.Range
         On Error Resume Next
         TestR = Wksht.Range(R)
-        NamedRangeExists = Err.Number = 0
         On Error GoTo 0
+        NamedRangeExists = Err.Number = 0
     End Function
     Function ReplaceFormulaRefs(FormulaText As String, NewText As String) As String
         'Replaces all sheet references in FormulaText with NewText
@@ -137,7 +137,7 @@
         '='tt'!CAR&tt!E3&" ""X"" "&'[Bill macros.xla]BillTemplate'!$G$23 &" &'YY' "&'12 00'!G3&" "&'C:\Users\gert.brits\Documents\Bill of Quantities\[Bill macros.xla]BillTemplate'!$K$1
         'The syntax of a reference is "'path[workbookname]sheetname'!reference" but some references are not enclosed in singel quotes
 
-        'todo #REF creates a runtime error
+        'Add "If TypeOf Cell.Value IsNot Int32" before calling to avoid formula errors
 
         Dim regexpattern As String
         regexpattern = "['_a-zA-Z0-9\s\[\]\.:\\]+!" '"'(.*?)'" does not work because it only catches references in single quotes
@@ -181,7 +181,9 @@
         On Error Resume Next
         For Each Cell In TemplateSheet.UsedRange.SpecialCells(Excel.XlCellType.xlCellTypeFormulas)
             If Cell.HasFormula Then
-                Cell.Formula = ReplaceFormulaRefs(Cell.Formula, TemplateName & "!")
+                If TypeOf Cell.Value IsNot Int32 Then 'Only replace formulas in error free cells
+                    Cell.Formula = ReplaceFormulaRefs(Cell.Formula, TemplateName & "!")
+                End If
             End If
         Next
         On Error GoTo 0
@@ -193,17 +195,17 @@
         xlAp.ScreenUpdating = False 'Stop screen updating so that the second workbook does not show
         'It is not possible to copy worksheet objects between excel instances, only between workbooks in the same instance
 
-        On Error Resume Next
         xlWb = xlAp.ActiveWorkbook
         xlAp.DisplayAlerts = False
+        On Error Resume Next
         xlWb.Worksheets(SheetName).Delete()
+        On Error GoTo 0
         xlAp.DisplayAlerts = True
         If Err.Number > 0 Then 'SheetName did not exist
             MsgBox(SheetName & " sheet was created", vbOKOnly)
         Else 'SheetName did exist
             MsgBox(SheetName & " sheet was recreated because it was not correct", vbOKOnly)
         End If
-        On Error GoTo 0
         TemplateWB = xlAp.Workbooks.Open(TemplatePath & "\" & BillMacrosTemplate, [ReadOnly]:=True)
         If AfterEnd = True Then 'Copy to last worksheet position
             TemplateWB.Worksheets(SheetName).Copy(After:=xlWb.Worksheets(xlWb.Worksheets.Count))

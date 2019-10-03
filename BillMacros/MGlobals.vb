@@ -136,6 +136,7 @@
             MsgBox(Err.Description)
             Err.Clear()
         End If
+        On Error GoTo 0
     End Function
     'Sub TT() 'to test speed of checking if a network path exists
     '    Dim a As String, b As String, c As String
