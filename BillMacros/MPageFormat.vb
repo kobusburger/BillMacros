@@ -117,7 +117,9 @@
                             BillRow = BillRow + BillTemplate.Range(RowType).Rows.Count
 
                         Case "NOTE"
+                            CopyBillRow(Billsheet, BillTemplate.Range(RowType), .Cells(BillRow, 1))
                             .Rows(BillRow + 1).Insert(shift:=Excel.XlDirection.xlDown)
+                            BillTemplate.Range("Blank").Copy(.Cells(BillRow + 1, 1))
                             EndBillRow = EndBillRow + 1
                             BillRow = BillRow + 1
                             BillRow = BillRow + BillTemplate.Range("NOTE").Rows.Count
