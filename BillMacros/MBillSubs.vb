@@ -218,27 +218,22 @@
     End Sub
     Sub DeleteBlankRows()
         'This function Deletes empty rows in the selected rows
-        Dim RangeRow As Integer, RowCount As Integer
-        Dim RowNo As Integer, LastUsedRow As Integer
-        Dim SelRows As Excel.Range
-        XlWb = xlAp.ActiveWorkbook
-        XlSh = XlWb.ActiveSheet
-        SelRows = xlAp.Selection
-        LastUsedRow = xlAp.ActiveCell.SpecialCells(Excel.XlCellType.xlCellTypeLastCell).Row
-        If LastUsedRow < SelRows(SelRows.Rows.Count).row Then
-            RowCount = LastUsedRow - SelRows(1).row + 1 'limit row range to last used cell
-        Else
-            RowCount = SelRows.Rows.Count
-        End If
-        RangeRow = 1
-        xlAp.ScreenUpdating = False
-        While RangeRow <= RowCount
-            RowNo = SelRows.Rows(RangeRow).row
-            If xlAp.WorksheetFunction.CountA(XlSh.rows(RowNo)) = 0 Then 'delete empty rows
-                XlSh.Rows(RowNo).entirerow.delete
-                RowCount = RowCount - 1
+        Dim RowNo As Integer, LastRow As Integer
+        Dim StartRow As Integer
+        Dim SelectedRows As Excel.Range
+        xlWb = xlAp.ActiveWorkbook
+        xlSh = xlWb.ActiveSheet
+        SelectedRows = xlAp.Selection
+        LastRow = SelectedRows.Rows.Count + SelectedRows.Row - 1
+        StartRow = SelectedRows.Row
+        'xlAp.ScreenUpdating = False
+        RowNo = StartRow
+        While RowNo <= LastRow 'Use While because the variable of For may not be changed
+            If xlAp.WorksheetFunction.CountA(xlSh.Rows(RowNo)) = 0 Then 'delete empty rows
+                xlSh.Rows(RowNo).entirerow.delete
+                LastRow = LastRow - 1
             Else
-                RangeRow = RangeRow + 1
+                RowNo = RowNo + 1
             End If
         End While
 
