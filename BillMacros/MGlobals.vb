@@ -48,12 +48,16 @@
             "083 228 9674 kobusgburger@gmail.com" & vbCrLf &
             vbCrLf & "Version date: " & VersionDate.ToString("yyyy-MM-dd HH:mm:ss") & vbCrLf &
             "Version: " & AssemblyVersion.ToString & vbCrLf &
-            "Published version: " & PublishVersion
+            "Published version: " & PublishVersion '& GetDefaultPrinter()
         '"Note that activity is being logged for statistical purposes"
         '    "Termination date: " & TerminationDate & vbCrLf &
 
         MsgBox(Msg, vbOKOnly, "Bill Macros")
     End Sub
+    Function GetDefaultPrinter() As String
+        Dim settings As Drawing.Printing.PrinterSettings = New Drawing.Printing.PrinterSettings()
+        Return settings.PrinterName
+    End Function
     Sub LogTrackInfo(MenuItem As String) 'Deactivated logging
         'Dim TrackText As String
         'Dim FileName As String

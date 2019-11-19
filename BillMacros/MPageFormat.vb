@@ -140,7 +140,9 @@
                 .PageSetup.PrintArea = .Range(.Cells(1, 2), .Cells(EndBillRow + 2, 8)).Address
                 If BillInfoDict.ContainsKey("PrintTitleRows") Then .PageSetup.PrintTitleRows = BillInfoDict("PrintTitleRows")
             End With
+            SetForcedPagePar(Billsheet)   'Set the forced page parameters that affect page breaks
             InsertPageBreaks(Billsheet)
+            FillLastPage(Billsheet)
         End If
         xlAp.ActiveWindow.FreezePanes = False
         xlAp.ActiveWindow.Split = False
@@ -178,56 +180,42 @@
         End Select
     End Function
     Sub InsertPageBreaks(Billsheet As Excel.Worksheet)
-        'Set the forced page parameters that affect page breaks
         Dim MaxPages As Integer 'The maximum number of pages that will be processed
-        'Determine the page breaks and insert pagebreak lines
-        SetForcedPagePar(Billsheet)
-        'Page break variables
-        Dim BreakNo As Integer, TotalPageBreaks As Integer, BreakLine As Integer, PrevBreakLine As Integer
-        Dim ExtraRows As Integer
-        'Page layout variables
-        Dim PrintHeight As Single, RepeatRowsHeight As Single
-        Dim FreeSpace As Single, PageHeight As Single
-        'Row variables
-        Dim SumRowHeights As Single, i As Integer, InsertRowHeight As Single, PBRowHeight As Single
-        Dim LastVisibleRow As Integer, LastBillRow As Integer
 
-        Dim BillTemplate As Excel.Worksheet = XlWb.Worksheets("BillTemplate")
+        Dim BreakNo As Integer, TotalPageBreaks As Integer, BreakLine As Integer
+        Dim PrintHeight As Single, PageHeight As Single
+        Dim SumRowHeights As Single, PBRowsHeight As Single
+        Dim BillTemplate As Excel.Worksheet = xlWb.Worksheets("BillTemplate")
 
+        If IsActivated() Then
+            MaxPages = 100 'Limit pages in case there is an endless loop
+        Else
+            MaxPages = 2 'Limit the number of page if Bill Macros is not activated
+        End If
+
+        'Determine the page breaks and insert pagebreak (PB) rows
         With Billsheet
-            'Initialise variables
-            Const ExtraSpaceToLeave = 5
-            PBRowHeight = BillTemplate.Range("PB").Height / 2
+            PBRowsHeight = BillTemplate.Range("PB").Height / 2
             PageHeight = 297 * 72 / 25.4    'A4 = 210 mm x 297 mm; convert to points
             PrintHeight = PageHeight - .PageSetup.TopMargin - .PageSetup.BottomMargin
-            BreakNo = 1
             .ResetAllPageBreaks()
+
+            'Add-page-breaks loop
             TotalPageBreaks = .HPageBreaks.Count
-            RepeatRowsHeight = .Rows(1).RowHeight + .Rows(2).RowHeight
-            PrevBreakLine = 3 'Start after top repeating rows
-
-            '-- Add page breaks loop --
-
-            If IsActivated() Then
-                MaxPages = 100
-            Else
-                MaxPages = 2 'Limit the number of page if Bill Macros is not activated
-            End If
-
-
+            BreakNo = 1
             While BreakNo <= TotalPageBreaks And BreakNo < MaxPages
                 xlAp.StatusBar = "InsertPageBreaks/ Sheet: " & Billsheet.Name & "/ Break No:" & BreakNo & " of " & TotalPageBreaks
                 If BreakNo Mod 10 = 0 Then Windows.Forms.Application.DoEvents() 'DoEvents was added to avoid RuntimeCallableWrapper failed error
-                BreakLine = .HPageBreaks.Item(BreakNo).Location.Row
+                BreakLine = .HPageBreaks.Item(BreakNo).Location.Row 'Pagebreak is before pagebreak row
                 SumRowHeights = 0
                 'Decrement BreakLine until the sum of row heights is larger than the PB row height
-                While SumRowHeights < PBRowHeight
-                    SumRowHeights = SumRowHeights + .Rows(BreakLine - 1).RowHeight
-                    'If SumRowHeights < PBRowHeight Then 'Hoekom is hierdie lyn hier?
-                    BreakLine = BreakLine - 1
+                While SumRowHeights < PBRowsHeight
+                    SumRowHeights += .Rows(BreakLine - 1).RowHeight
+                    BreakLine -= 1
                 End While
-                'Insert PB rows & manual page break
-                .Rows(BreakLine - 1).Insert(shift:=Excel.XlDirection.xlDown)   'Insert the 6 rows for a page break
+
+                'Insert 6 PB rows & manual page break
+                .Rows(BreakLine - 1).Insert(shift:=Excel.XlDirection.xlDown)
                 .Rows(BreakLine - 1).Insert(shift:=Excel.XlDirection.xlDown)
                 .Rows(BreakLine - 1).Insert(shift:=Excel.XlDirection.xlDown)
                 .Rows(BreakLine - 1).Insert(shift:=Excel.XlDirection.xlDown)
@@ -235,36 +223,55 @@
                 .Rows(BreakLine - 1).Insert(shift:=Excel.XlDirection.xlDown)
                 BillTemplate.Range("PB").Copy(.Cells(BreakLine - 1, 1))
                 .Rows(BreakLine + 2).PageBreak = Excel.XlPageBreak.xlPageBreakManual
-                BreakNo = BreakNo + 1
-                PrevBreakLine = BreakLine
+                BreakNo += 1
                 TotalPageBreaks = .HPageBreaks.Count
             End While
             xlAp.StatusBar = False
-            'On the last page increase last line before PB to fill page
-            SumRowHeights = RepeatRowsHeight
-            LastBillRow = .Columns(1).Find("#BillEnd#").Row
-            BillTemplate.Range("BillEnd").Copy(.Cells(LastBillRow, 1))
-            For i = PrevBreakLine To LastBillRow
-                SumRowHeights = SumRowHeights + .Rows(i).RowHeight
-            Next
-            FreeSpace = PrintHeight - SumRowHeights
+        End With
+    End Sub
+    Sub FillLastPage(BillSheet As Excel.Worksheet)
+        'Determine free space on the page and add empty blank row to fill the free space
 
-            If FreeSpace > ExtraSpaceToLeave Then 'Do not decrease the last row height but leave extra space
-                'Find last visible row because some rows may be hidden
-                SumRowHeights = 0
-                LastVisibleRow = LastBillRow - 1
-                While SumRowHeights < 1
-                    SumRowHeights = SumRowHeights + .Rows(LastVisibleRow).RowHeight
-                    If SumRowHeights < 1 Then LastVisibleRow = LastVisibleRow - 1
-                End While
-                'Add space to fill page
-                InsertRowHeight = .Rows(LastVisibleRow).RowHeight
-                ExtraRows = Int(FreeSpace / InsertRowHeight)
-                For i = 1 To ExtraRows
-                    .Rows(LastVisibleRow + 1).Insert(shift:=Excel.XlDirection.xlDown)
-                    BillTemplate.Range("Blank").Copy(.Cells(LastVisibleRow + 1, 1))
-                Next
+        'todo get printour height more accurate on last page
+        'Test printer info System.Printing.PageImageableArea. https: //stackoverflow.com/questions/296182/how-to-get-printer-info-in-net#296232
+        '"page Layout" height is about 2% less than printout
+        'The sum of row heights is about 6% less than printout
+        'https://docs.microsoft.com/en-us/office/troubleshoot/excel/worksheet-printed-different-size
+        'https://inneka.com/programming/c/how-to-get-printer-info-in-net/
+
+        Dim NoOfExtraRows As Integer, PageFreeSpace As Single
+        Dim LastBillRow As Integer, PrintTitleRowsHeight As Single
+        Dim InsertRowHeight As Single, SumRowHeights As Single
+        Dim PrevBreakRow As Integer, TotalPageBreaks As Integer
+        Dim PrintHeight As Single, PageHeight As Single
+        Dim BillTemplate As Excel.Worksheet = xlWb.Worksheets("BillTemplate")
+
+        With BillSheet
+            TotalPageBreaks = .HPageBreaks.Count
+            PrevBreakRow = 1
+            PrintTitleRowsHeight = 0 'The first page does not have title rows
+            If TotalPageBreaks > 0 Then 'More than one page
+                PrevBreakRow = .HPageBreaks.Item(TotalPageBreaks).Location.Row
+                PrintTitleRowsHeight = .Range(.PageSetup.PrintTitleRows).Height
             End If
+
+            Const ExtraSpaceToLeave = 1 'This is to allow for inaccurate printing heights
+            LastBillRow = .Columns(1).Find("#BillEnd#").Row + 2
+            PageHeight = 297 * 72 / 25.4    'A4 = 210 mm x 297 mm; convert to points (1 point = 1/72 inch)
+            PrintHeight = PageHeight - .PageSetup.TopMargin - .PageSetup.BottomMargin - PrintTitleRowsHeight - ExtraSpaceToLeave
+            InsertRowHeight = 12.75 'For default font Calibri(Body Font) 10 (File/Options/General/When creating new workbooks)
+
+            SumRowHeights = 0
+            For i = PrevBreakRow To LastBillRow
+                SumRowHeights += .Rows(i).RowHeight
+            Next
+
+            PageFreeSpace = PrintHeight - SumRowHeights
+            NoOfExtraRows = Int(PageFreeSpace / InsertRowHeight)
+            For i = 1 To NoOfExtraRows
+                .Rows(LastBillRow - 2).Insert(shift:=Excel.XlDirection.xlDown) 'Insert uses the same font size and therefore default row height
+                BillTemplate.Range("Blank").Copy(.Cells(LastBillRow - 2, 1)) 'Copy ensures the correct border lines
+            Next
         End With
     End Sub
     Sub DeletePageBreaks(Billsheet As Excel.Worksheet)
@@ -393,14 +400,16 @@
         ToRange.PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormats, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=False)
         For Each LoopCell In FromRange
             '            If xlAp.WorksheetFunction.IsFormula(LoopCell) Then
-            If LoopCell.Column = ItemNoCol Or LoopCell.Column = PricedAmtCol Then 'Only copy cells in the "Item No" and "Amount" columns
-                ColOffset = LoopCell.Column - FromRange.Column
-                RowOffset = LoopCell.Row - FromRange.Row
-                LoopCell.Copy()
-                ToRange.Offset(RowOffset, ColOffset).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormulas, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=False)
-                ToRange.Offset(RowOffset, ColOffset).Formula = ReplaceCounters(ToRange.Offset(RowOffset, ColOffset).Formula)
-                If TypeOf ToRange.Offset(RowOffset, ColOffset).Value IsNot Int32 Then 'Only replace formulas in error free cells
-                    ToRange.Offset(RowOffset, ColOffset).Formula = ReplaceFormulaRefs(ToRange.Offset(RowOffset, ColOffset).Formula, "'" & Billsheet.Name & "'!")
+            If LoopCell.Text <> "" Then 'Only process cells that are not empty
+                If LoopCell.Column = ItemNoCol Or LoopCell.Column = PricedAmtCol Then 'Only copy cells in the "Item No" and "Amount" columns
+                    ColOffset = LoopCell.Column - FromRange.Column
+                    RowOffset = LoopCell.Row - FromRange.Row
+                    LoopCell.Copy()
+                    ToRange.Offset(RowOffset, ColOffset).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormulas, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=False)
+                    ToRange.Offset(RowOffset, ColOffset).Formula = ReplaceCounters(ToRange.Offset(RowOffset, ColOffset).Formula)
+                    If TypeOf ToRange.Offset(RowOffset, ColOffset).Value IsNot Int32 Then 'Only replace formulas in error free cells
+                        ToRange.Offset(RowOffset, ColOffset).Formula = ReplaceFormulaRefs(ToRange.Offset(RowOffset, ColOffset).Formula, "'" & Billsheet.Name & "'!")
+                    End If
                 End If
             End If
         Next
