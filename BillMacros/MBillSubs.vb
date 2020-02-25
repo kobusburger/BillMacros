@@ -225,19 +225,23 @@
         xlSh = xlWb.ActiveSheet
         SelectedRows = xlAp.Selection
         LastRow = SelectedRows.Rows.Count + SelectedRows.Row - 1
+        If LastRow > xlSh.UsedRange.Rows.Count Then LastRow = xlSh.UsedRange.Rows.Count 'Limit LastRow to used range
         StartRow = SelectedRows.Row
         'xlAp.ScreenUpdating = False
         RowNo = StartRow
         While RowNo <= LastRow 'Use While because the variable of For may not be changed
+            xlAp.StatusBar = "Row: " & RowNo & " of: " & LastRow
             If xlAp.WorksheetFunction.CountA(xlSh.Rows(RowNo)) = 0 Then 'delete empty rows
                 xlSh.Rows(RowNo).entirerow.delete
                 LastRow = LastRow - 1
             Else
                 RowNo = RowNo + 1
             End If
+            If RowNo Mod 10 = 0 Then Windows.Forms.Application.DoEvents() 'DoEvents was added to avoid RuntimeCallableWrapper failed error
         End While
 
         xlAp.ScreenUpdating = True
+        xlAp.StatusBar = False
     End Sub
 
 End Module

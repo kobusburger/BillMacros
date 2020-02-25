@@ -232,33 +232,25 @@
     Sub FillLastPage(BillSheet As Excel.Worksheet)
         'Determine free space on the page and add empty blank row to fill the free space
 
-        'todo get printour height more accurate on last page
-        'Test printer info System.Printing.PageImageableArea. https: //stackoverflow.com/questions/296182/how-to-get-printer-info-in-net#296232
-        '"page Layout" height is about 2% less than printout
-        'The sum of row heights is about 6% less than printout
-        'https://docs.microsoft.com/en-us/office/troubleshoot/excel/worksheet-printed-different-size
-        'https://inneka.com/programming/c/how-to-get-printer-info-in-net/
-
         Dim NoOfExtraRows As Integer, PageFreeSpace As Single
         Dim LastBillRow As Integer, PrintTitleRowsHeight As Single
         Dim InsertRowHeight As Single, SumRowHeights As Single
         Dim PrevBreakRow As Integer, TotalPageBreaks As Integer
-        Dim PrintHeight As Single, PageHeight As Single
+        Dim PrintHeight As Single
         Dim BillTemplate As Excel.Worksheet = xlWb.Worksheets("BillTemplate")
 
         With BillSheet
             TotalPageBreaks = .HPageBreaks.Count
             PrevBreakRow = 1
             PrintTitleRowsHeight = 0 'The first page does not have title rows
-            If TotalPageBreaks > 0 Then 'More than one page
+            If TotalPageBreaks > 0 Then 'If more than one page
                 PrevBreakRow = .HPageBreaks.Item(TotalPageBreaks).Location.Row
                 PrintTitleRowsHeight = .Range(.PageSetup.PrintTitleRows).Height
             End If
 
             Const ExtraSpaceToLeave = 1 'This is to allow for inaccurate printing heights
             LastBillRow = .Columns(1).Find("#BillEnd#").Row + 2
-            PageHeight = 297 * 72 / 25.4    'A4 = 210 mm x 297 mm; convert to points (1 point = 1/72 inch)
-            PrintHeight = PageHeight - .PageSetup.TopMargin - .PageSetup.BottomMargin - PrintTitleRowsHeight - ExtraSpaceToLeave
+            PrintHeight = PagePrintHeight() - .PageSetup.TopMargin - .PageSetup.BottomMargin - PrintTitleRowsHeight - ExtraSpaceToLeave
             InsertRowHeight = 12.75 'For default font Calibri(Body Font) 10 (File/Options/General/When creating new workbooks)
 
             SumRowHeights = 0
@@ -274,6 +266,18 @@
             Next
         End With
     End Sub
+    Function PagePrintHeight() As Single
+        'Printable page height in points
+
+        'todo get printour height more accurate on last page
+        'Test printer info System.Printing.PageImageableArea. https://stackoverflow.com/questions/296182/how-to-get-printer-info-in-net#296232
+        'Sum of row heights is about 2.3% to 3.5% less than printout height depending on the border line thickness. Maybe increase PagePrintHeight with this %? 
+        'Excel's Page layout ruler is not accurate. It changes with zoom. Print preview and printed pdf's seem accurate
+        'https://docs.microsoft.com/en-us/office/troubleshoot/excel/worksheet-printed-different-size
+        'https://inneka.com/programming/c/how-to-get-printer-info-in-net/
+
+        PagePrintHeight = 297 * 72 / 25.4    'A4 = 210 mm x 297 mm; convert to points (1 point = 1/72 inch)
+    End Function
     Sub DeletePageBreaks(Billsheet As Excel.Worksheet)
         With Billsheet
             Dim BillRow As Integer, LastBillRow As Integer
