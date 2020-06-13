@@ -108,6 +108,7 @@
                             BillRow = BillRow + BillTemplate.Range("BILLEND").Rows.Count
 
                         Case "#BILLSHEET#"
+                            'Only formats are copied
                             BillTemplate.Range("BILLSHEET").Copy()
                             .Cells(BillRow, 1).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormats, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=False)
                             BillRow = BillRow + BillTemplate.Range("BILLSHEET").Rows.Count

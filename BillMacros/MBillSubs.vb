@@ -135,12 +135,12 @@
         'Add VBA reference to "Microsoft VBScript Regular Expressions 5.5"
         'The following FormulaText can be used to test this function
         '='tt'!CAR&tt!E3&" ""X"" "&'[Bill macros.xla]BillTemplate'!$G$23 &" &'YY' "&'12 00'!G3&" "&'C:\Users\gert.brits\Documents\Bill of Quantities\[Bill macros.xla]BillTemplate'!$K$1
-        'The syntax of a reference is "'path[workbookname]sheetname'!reference" but some references are not enclosed in singel quotes
+        'The syntax of a reference is "'path[workbookname]sheetname'!reference" but some references are not enclosed in single quotes
 
         'Add "If TypeOf Cell.Value IsNot Int32" before calling to avoid formula errors
 
         Dim regexpattern As String
-        regexpattern = "['_a-zA-Z0-9\s\[\]\.:\\]+!" '"'(.*?)'" does not work because it only catches references in single quotes
+        regexpattern = "['_a-zA-Z0-9\s\[\]\.:\\]+!"           '  "'(.*?)'" does not work because it only catches references in single quotes
         Dim re As New System.Text.RegularExpressions.Regex(regexpattern)
 
         'Return all allowed charactors before "!" including "!"
@@ -159,6 +159,7 @@
         Dim TemplateSheet As Excel.Worksheet
         Dim Cell As Excel.Range
         Dim BillSheets As Excel.Sheets
+        Dim FormulasRange As Excel.Range
         xlWb = xlAp.ActiveWorkbook
         BillSheets = xlWb.Worksheets
 
@@ -179,14 +180,18 @@
         'Replace sheet references in formules with TemplateName
         TemplateSheet = xlWb.Worksheets(TemplateName)
         On Error Resume Next
-        For Each Cell In TemplateSheet.UsedRange.SpecialCells(Excel.XlCellType.xlCellTypeFormulas)
-            If Cell.HasFormula Then
-                If TypeOf Cell.Value IsNot Int32 Then 'Only replace formulas in error free cells
-                    Cell.Formula = ReplaceFormulaRefs(Cell.Formula, TemplateName & "!")
-                End If
-            End If
-        Next
+        FormulasRange = TemplateSheet.UsedRange.SpecialCells(Excel.XlCellType.xlCellTypeFormulas)
         On Error GoTo 0
+        'todo why is this done for sumtemplate & bill template if the sheet name does not change and info does not have formulas?
+        If Not (FormulasRange Is Nothing) Then
+            For Each Cell In FormulasRange
+                If Cell.HasFormula Then
+                    If TypeOf Cell.Value IsNot Int32 Then 'Only replace formulas in error free cells
+                        Cell.Formula = ReplaceFormulaRefs(Cell.Formula, TemplateName & "!")
+                    End If
+                End If
+            Next
+        End If
     End Sub
     Sub CreateSheet(SheetName As String, ShtColor As Excel.XlRgbColor, AfterEnd As Boolean)
         'Delete SheetName and copy template sheet from BillMacrosTemplate
