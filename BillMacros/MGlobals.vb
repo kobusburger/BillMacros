@@ -58,11 +58,29 @@
         Dim settings As Drawing.Printing.PrinterSettings = New Drawing.Printing.PrinterSettings()
         Return settings.PrinterName
     End Function
-    Sub LogTrackInfo(MenuItem As String) 'Deactivated logging
+    Sub LogTrackInfo(MenuItem As String) 'Use Azure application insights
+        Dim tc As New Microsoft.ApplicationInsights.TelemetryClient
+        Dim UserName As String
+        Dim PubVer As String
+
+        UserName = Environ$("Username")
+        PubVer = ""
+        If Deployment.Application.ApplicationDeployment.IsNetworkDeployed Then
+            PubVer = Deployment.Application.ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString(4)
+        End If
+
+        tc.InstrumentationKey = "1ab23a13-3854-4c48-9bbb-5b1e2c7d9b2e"
+        tc.Context.Session.Id = Guid.NewGuid.ToString
+        tc.Context.Device.OperatingSystem = Environment.OSVersion.ToString
+        tc.Context.User.AuthenticatedUserId = Environ$("Username")
+        tc.Context.Component.Version = PubVer
+        tc.TrackEvent(MenuItem)
+        tc.Flush()
+
+
         'Dim TrackText As String
         'Dim FileName As String
         'Dim FilePath As String
-        'Dim UserName As String
         'Dim DateTimeStr As String
         'Dim VersionDate As String
         'Dim LogTask As Threading.Tasks.Task
@@ -72,7 +90,6 @@
         ''todo Implement logging on cloud server
         ''https://docs.microsoft.com/en-us/dotnet/visual-basic/programming-guide/concepts/async/
 
-        'UserName = Environ$("Username")
         'FilePath = "\\aurecon.info\shares\ZAPTA\Admin\Admin\GAUZABLD\SW\"
         'FileName = "tracking.txt"
         'DateTimeStr = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
