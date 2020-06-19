@@ -19,6 +19,8 @@
               screentip="Create a bill without formulas and redundant information" onAction="OnCreateStripped"/>
           <button id="CreatePricedBill" label="Create Priced Bill"
               screentip="Create a priced bill without formulas and redundant information" onAction="OnCreatePriced"/>
+          <button id="DeleteBlankRows" label="Delete blank rows"
+              screentip="Ony the blank rows (rows with only empty cells) in the selected rows will be deleted" onAction="OnDeleteBlankRows"/>
           <button id="About" label="About"
               screentip="Additional information on Bill Macros" onAction="OnAboutBill"/>
         </group>

@@ -1,25 +1,21 @@
 ﻿Module MEditFormat
     Sub EditFormat()
-        Dim Wksht As Excel.Worksheet, BillSheets As Excel.Sheets
+        Dim Wksht As Excel.Worksheet
         Dim ActShtName As String
         Dim FSSel As New FSheetSel
-        Dim xlAp As Excel.Application
-        Dim XlWb As Excel.Workbook
-        Dim XlSh As Excel.Worksheet
-        xlAp = Globals.ThisAddIn.Application
-        XlWb = xlAp.ActiveWorkbook
-        XlSh = XlWb.ActiveSheet
-        ActShtName = XlSh.Name
+        Dim BillSheets As Excel.Sheets
+        xlWb = xlAp.ActiveWorkbook
+        xlSh = xlWb.ActiveSheet
+        ActShtName = xlSh.Name
         ShowActivationNotice() 'Show activation warning window
         FSSel.Text = "Edit Format"
         FSSel.ShowDialog()
         If FSSel.DialogResult <> System.Windows.Forms.DialogResult.OK Then Return
 
         LogTrackInfo("EditFormat")
+        BillSheets = xlWb.Worksheets
         If FSSel.SelSheets.Checked = True Then
             BillSheets = xlAp.ActiveWindow.SelectedSheets
-        Else
-            BillSheets = XlWb.Worksheets
         End If
         FSSel.Dispose()
 
@@ -29,7 +25,7 @@
                 EditFormatSub(Wksht)
             End If
         Next
-        XlWb.Sheets(ActShtName).Select
+        xlWb.Sheets(ActShtName).Select
     End Sub
     Sub EditFormatSub(Billsheet As Excel.Worksheet)
         'This function does the following:
@@ -37,8 +33,6 @@
         '- Removes page ends
         '- Deletes empty rows
         Dim BillRow As Integer, LastBillRow As Integer
-        Dim xlAp As Excel.Application
-        xlAp = Globals.ThisAddIn.Application
         If CheckSheetType(Billsheet) = "#BillSheet#" Then
             With Billsheet
                 xlAp.ScreenUpdating = False
@@ -46,6 +40,7 @@
                 BillRow = 1
                 Do While BillRow <= LastBillRow 'Use a Do While because a For Next loop can be endless if the end value is changed
                     xlAp.StatusBar = "EditFormat/ Sheet: " & Billsheet.Name & "/ Row:" & BillRow & " of " & LastBillRow
+                    If BillRow Mod 10 = 0 Then Windows.Forms.Application.DoEvents() 'DoEvents was added to avoid RuntimeCallableWrapper failed error
                     Select Case UCase(Trim(.Cells(BillRow, 1).value))
                         Case "PB"
                             .Rows(BillRow).Delete

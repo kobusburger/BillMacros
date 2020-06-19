@@ -16,72 +16,118 @@
     SumAmtCol As Integer = 4,
     SumPricedAmtCol As Integer = 5
 
-    Public Const BillMacrosTemplate As String = "BillMacrosTemplate.xlsx" 'todo impliment BillMacrosTemplate.xlsx
-    Const VerYear As Integer = 2018,
-    VerMonth As Integer = 7,
-    VerDay As Integer = 17
+    Public Const BillMacrosTemplate As String = "BillMacrosTemplate.xlsx"
+    'Const VerYear As Integer = 2019,
+    'VerMonth As Integer = 7,
+    'VerDay As Integer = 9
 
-    Const ActiveDays As Integer = 180 'The functionality will be reduced after the ActiveDays
+    Const ActiveDays As Integer = 360 'The functionality will be reduced after the ActiveDays
+
+    'Global variable used in most modules
+    'todo Should these be global? Some are redfined in modules
+    Public xlAp As Excel.Application = Globals.ThisAddIn.Application
+    Public xlWb As Excel.Workbook
+    Public xlSh As Excel.Worksheet
 
     Sub AboutBill()
         Dim Msg As String
         Dim TerminationDate As Date
-        Dim VersionDate As String
-        VersionDate = VerYear & VerMonth.ToString("-00-") & VerDay.ToString("00")
-        TerminationDate = DateSerial(VerYear, VerMonth, VerDay + ActiveDays)
+        Dim PublishVersion As String
+        Dim AssemblyVersion As System.Version
+        Dim VersionDate As New Date(2000, 1, 1)
+        TerminationDate = VersionDate.AddDays(ActiveDays)
+        If System.Deployment.Application.ApplicationDeployment.IsNetworkDeployed Then
+            PublishVersion = System.Deployment.Application.ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString
+        Else
+            PublishVersion = ""
+        End If
+        AssemblyVersion = System.Reflection.Assembly.GetExecutingAssembly.GetName.Version
+        VersionDate = VersionDate.AddDays(AssemblyVersion.Build)
+        VersionDate = VersionDate.AddSeconds(AssemblyVersion.Revision * 2)
         Msg = "The bill functions assist with the formatting of bills" & vbCrLf & vbCrLf &
-    "Written by Kobus Burger © " & Left(VersionDate, 4) & vbCrLf &
-    "083 228 9674 kobusgburger@gmail.com" & vbCrLf &
-    vbCrLf & "Version date: " & VersionDate & vbCrLf &
-    "Termination date: " & TerminationDate & vbCrLf &
-    "Note that activity is being logged for statistical purposes"
+            "Written by Kobus Burger © " & VersionDate.Year & vbCrLf &
+            "083 228 9674 kobusgburger@gmail.com" & vbCrLf &
+            vbCrLf & "Version date: " & VersionDate.ToString("yyyy-MM-dd HH:mm:ss") & vbCrLf &
+            "Version: " & AssemblyVersion.ToString & vbCrLf &
+            "Published version: " & PublishVersion '& GetDefaultPrinter()
+        '"Note that activity is being logged for statistical purposes"
+        '    "Termination date: " & TerminationDate & vbCrLf &
 
         MsgBox(Msg, vbOKOnly, "Bill Macros")
     End Sub
-    Sub LogTrackInfo(MenuItem As String)
-        Dim TrackText As String
-        Dim FileName As String
-        Dim FilePath As String
+    Function GetDefaultPrinter() As String
+        Dim settings As Drawing.Printing.PrinterSettings = New Drawing.Printing.PrinterSettings()
+        Return settings.PrinterName
+    End Function
+    Sub LogTrackInfo(MenuItem As String) 'Use Azure application insights
+        Dim tc As New Microsoft.ApplicationInsights.TelemetryClient
         Dim UserName As String
-        Dim DateTimeStr As String
-        Dim VersionDate As String
-        Dim LogTask As Threading.Tasks.Task
-        '        Dim FSO As New FileSystemObject
-        VersionDate = VerYear & VerMonth.ToString("-00-") & VerDay.ToString("00")
-        'todo Maybe async (only VB, not VBA) can limit the delay if the file cannot be accessed
-        'todo Implement logging on cloud server
-        'https://docs.microsoft.com/en-us/dotnet/visual-basic/programming-guide/concepts/async/
+        Dim PubVer As String
+        Dim EventProperties = New Dictionary(Of String, String)
 
+        EventProperties.Add("FilePath", xlWb.FullName)
         UserName = Environ$("Username")
-        FilePath = "\\aurecon.info\shares\ZAPTA\Admin\Admin\GAUZABLD\2 Modify\Building Electrical Electronic Services\Software\ExcelAddins\"
-        FileName = "tracking.txt"
-        DateTimeStr = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
-        TrackText = DateTimeStr & vbTab &
-            UserName & vbTab & vbTab &
-            "BillMacrosVS" & vbTab & VersionDate & vbTab & MenuItem & vbCrLf
-        '        On Error Resume Next
-        '        TT = FSO.Drives.Item("N:") 'Drives correspond to Net Use. It may not show the correct connection status. This is specific to Aurecon network
+        PubVer = ""
+        If Deployment.Application.ApplicationDeployment.IsNetworkDeployed Then
+            PubVer = Deployment.Application.ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString(4) 'Returns 4 components i.e. major.minor.build.revision
+        End If
 
-        On Error Resume Next
-        IO.File.AppendAllText(FilePath & FileName, TrackText)
-        On Error GoTo 0
+        tc.InstrumentationKey = "1ab23a13-3854-4c48-9bbb-5b1e2c7d9b2e"
+        tc.Context.Session.Id = Guid.NewGuid.ToString
+        tc.Context.Device.OperatingSystem = Environment.OSVersion.ToString
+        tc.Context.User.AuthenticatedUserId = Environ$("Username")
+        tc.Context.Component.Version = PubVer
+        tc.TrackEvent(MenuItem, EventProperties)
+        tc.Flush()
+
+
+        'Dim TrackText As String
+        'Dim FileName As String
+        'Dim FilePath As String
+        'Dim DateTimeStr As String
+        'Dim VersionDate As String
+        'Dim LogTask As Threading.Tasks.Task
+        ''        Dim FSO As New FileSystemObject
+        'VersionDate = VerYear & VerMonth.ToString("-00-") & VerDay.ToString("00")
+        ''todo Maybe async (only VB, not VBA) can limit the delay if the file cannot be accessed
+        ''todo Implement logging on cloud server
+        ''https://docs.microsoft.com/en-us/dotnet/visual-basic/programming-guide/concepts/async/
+
+        'FilePath = "\\aurecon.info\shares\ZAPTA\Admin\Admin\GAUZABLD\SW\"
+        'FileName = "tracking.txt"
+        'DateTimeStr = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+        'TrackText = DateTimeStr & vbTab &
+        '    UserName & vbTab & vbTab &
+        '    "BillMacrosVS" & vbTab & VersionDate & vbTab & MenuItem & vbCrLf
+        ''        On Error Resume Next
+        ''        TT = FSO.Drives.Item("N:") 'Drives correspond to Net Use. It may not show the correct connection status. This is specific to Aurecon network
+
+        'On Error Resume Next
+        'IO.File.AppendAllText(FilePath & FileName, TrackText)
+        'On Error GoTo 0
     End Sub
     Function IsActivated() As Boolean
         'Return true if Bill Macros is activated
-        Dim TerminationDate As Date
-        TerminationDate = DateSerial(VerYear, VerMonth, VerDay + ActiveDays)
+        IsActivated = True 'Removed activation limit
+        'Dim TerminationDate As Date
+        'TerminationDate = DateSerial(VerYear, VerMonth, VerDay + ActiveDays)
 
-        If DateDiff("d", Date.Now, TerminationDate) < 0 Then
-            IsActivated = False
-        Else
-            IsActivated = True
-        End If
+        'If DateDiff("d", Date.Now, TerminationDate) < 0 Then
+        '    IsActivated = False
+        'Else
+        '    IsActivated = True
+        'End If
 
     End Function
     Sub ShowActivationNotice()
-        'Show warning windows
+        'Show termination warning windows
         Dim TerminationDate As Date, RemainingDays As Integer
-        TerminationDate = DateSerial(VerYear, VerMonth, VerDay + ActiveDays)
+        Dim AssemblyVersion As System.Version
+        Dim VersionDate As New Date(2000, 1, 1)
+        AssemblyVersion = System.Reflection.Assembly.GetExecutingAssembly.GetName.Version
+        VersionDate = VersionDate.AddDays(AssemblyVersion.Build)
+        VersionDate = VersionDate.AddSeconds(AssemblyVersion.Revision * 2)
+        TerminationDate = VersionDate.AddDays(ActiveDays)
         RemainingDays = DateDiff("d", Date.Now, TerminationDate)
 
         Select Case RemainingDays
@@ -114,6 +160,7 @@
             MsgBox(Err.Description)
             Err.Clear()
         End If
+        On Error GoTo 0
     End Function
     'Sub TT() 'to test speed of checking if a network path exists
     '    Dim a As String, b As String, c As String
@@ -126,6 +173,4 @@
     '    e = Err.Number
     '    On Error GoTo 0
     'End Sub
-
-
 End Module

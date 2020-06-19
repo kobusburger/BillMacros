@@ -51,6 +51,9 @@ Public Class KBRibbon
     Public Sub OnCreatePriced(ByVal control As Office.IRibbonControl)
         CreatePriced()
     End Sub
+    Public Sub OnDeleteBlankRows(ByVal control As Office.IRibbonControl)
+        DeleteBlankRows()
+    End Sub
     Public Sub OnAboutBill(ByVal control As Office.IRibbonControl)
         AboutBill()
     End Sub
