@@ -24,6 +24,7 @@
     Const ActiveDays As Integer = 360 'The functionality will be reduced after the ActiveDays
 
     'Global variable used in most modules
+    'todo Should these be global? Some are redfined in modules
     Public xlAp As Excel.Application = Globals.ThisAddIn.Application
     Public xlWb As Excel.Workbook
     Public xlSh As Excel.Worksheet
@@ -62,11 +63,13 @@
         Dim tc As New Microsoft.ApplicationInsights.TelemetryClient
         Dim UserName As String
         Dim PubVer As String
+        Dim EventProperties = New Dictionary(Of String, String)
 
+        EventProperties.Add("FilePath", xlWb.FullName)
         UserName = Environ$("Username")
         PubVer = ""
         If Deployment.Application.ApplicationDeployment.IsNetworkDeployed Then
-            PubVer = Deployment.Application.ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString(4)
+            PubVer = Deployment.Application.ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString(4) 'Returns 4 components i.e. major.minor.build.revision
         End If
 
         tc.InstrumentationKey = "1ab23a13-3854-4c48-9bbb-5b1e2c7d9b2e"
@@ -74,7 +77,7 @@
         tc.Context.Device.OperatingSystem = Environment.OSVersion.ToString
         tc.Context.User.AuthenticatedUserId = Environ$("Username")
         tc.Context.Component.Version = PubVer
-        tc.TrackEvent(MenuItem)
+        tc.TrackEvent(MenuItem, EventProperties)
         tc.Flush()
 
 
