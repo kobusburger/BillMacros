@@ -24,10 +24,10 @@
     Const ActiveDays As Integer = 360 'The functionality will be reduced after the ActiveDays
 
     'Global variable used in most modules
-    'todo Should these be global? Some are redfined in modules
     Public xlAp As Excel.Application = Globals.ThisAddIn.Application
     Public xlWb As Excel.Workbook
     Public xlSh As Excel.Worksheet
+    Public tc As New Microsoft.ApplicationInsights.TelemetryClient
 
     Sub AboutBill()
         Dim Msg As String
@@ -60,7 +60,6 @@
         Return settings.PrinterName
     End Function
     Sub LogTrackInfo(MenuItem As String) 'Use Azure application insights
-        Dim tc As New Microsoft.ApplicationInsights.TelemetryClient
         Dim UserName As String
         Dim PubVer As String
         Dim EventProperties = New Dictionary(Of String, String)
@@ -79,32 +78,6 @@
         tc.Context.Component.Version = PubVer
         tc.TrackEvent(MenuItem, EventProperties)
         tc.Flush()
-
-
-        'Dim TrackText As String
-        'Dim FileName As String
-        'Dim FilePath As String
-        'Dim DateTimeStr As String
-        'Dim VersionDate As String
-        'Dim LogTask As Threading.Tasks.Task
-        ''        Dim FSO As New FileSystemObject
-        'VersionDate = VerYear & VerMonth.ToString("-00-") & VerDay.ToString("00")
-        ''todo Maybe async (only VB, not VBA) can limit the delay if the file cannot be accessed
-        ''todo Implement logging on cloud server
-        ''https://docs.microsoft.com/en-us/dotnet/visual-basic/programming-guide/concepts/async/
-
-        'FilePath = "\\aurecon.info\shares\ZAPTA\Admin\Admin\GAUZABLD\SW\"
-        'FileName = "tracking.txt"
-        'DateTimeStr = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
-        'TrackText = DateTimeStr & vbTab &
-        '    UserName & vbTab & vbTab &
-        '    "BillMacrosVS" & vbTab & VersionDate & vbTab & MenuItem & vbCrLf
-        ''        On Error Resume Next
-        ''        TT = FSO.Drives.Item("N:") 'Drives correspond to Net Use. It may not show the correct connection status. This is specific to Aurecon network
-
-        'On Error Resume Next
-        'IO.File.AppendAllText(FilePath & FileName, TrackText)
-        'On Error GoTo 0
     End Sub
     Function IsActivated() As Boolean
         'Return true if Bill Macros is activated

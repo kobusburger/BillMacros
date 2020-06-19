@@ -270,7 +270,7 @@
     Function PagePrintHeight() As Single
         'Printable page height in points
 
-        'todo get printour height more accurate on last page
+        'todo get printout height more accurate on last page
         'Test printer info System.Printing.PageImageableArea. https://stackoverflow.com/questions/296182/how-to-get-printer-info-in-net#296232
         'Sum of row heights is about 2.3% to 3.5% less than printout height depending on the border line thickness. Maybe increase PagePrintHeight with this %? 
         'Excel's Page layout ruler is not accurate. It changes with zoom. Print preview and printed pdf's seem accurate
