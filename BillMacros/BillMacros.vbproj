@@ -29,12 +29,12 @@
     <DefineConstants>VSTO40</DefineConstants>
     <StartupObject>
     </StartupObject>
-    <IsWebBootstrapper>False</IsWebBootstrapper>
+    <IsWebBootstrapper>True</IsWebBootstrapper>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <PublishUrl>Publish\</PublishUrl>
-    <InstallUrl />
+    <InstallUrl>http://kbeng.co.za/billmacros/</InstallUrl>
     <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.0.0.41</ApplicationVersion>
+    <ApplicationVersion>1.0.0.43</ApplicationVersion>
     <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateInterval>0</UpdateInterval>
@@ -249,8 +249,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="app.config" />
-    <None Include="BillMacros_TemporaryKey.pfx" />
     <Compile Include="MPageFormat.vb" />
+    <None Include="BilMacros Notes.docx" />
+    <None Include="kbeng.pfx" />
     <None Include="packages.config" />
     <None Include="ThisAddIn.Designer.xml">
       <DependentUpon>ThisAddIn.vb</DependentUpon>
@@ -306,10 +307,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>BillMacros_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>kbeng.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>FAA955A80429CFB0D5BF2D31F23BDB2C14C3AEE6</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>F854E1B1B4DCDDC680AA9A48BC884230F3334EAF</ManifestCertificateThumbprint>
   </PropertyGroup>
   <!-- Include the build rules for a Visual Basic project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
