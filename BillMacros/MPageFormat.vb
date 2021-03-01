@@ -385,7 +385,7 @@
         Next
     End Sub
     Sub HideRows(Billsheet As Excel.Worksheet, ByVal FromRow As Integer, ByVal ToRow As Integer)
-        'Hide all rows between StartRow and EndRow including StartRow and Endrow
+        'Hide all rows between FromRow and ToRow including FromRow and ToRow
         'Note that there are empty rows between each row and therefore the previous row is -2
         Dim R As Integer
         If ToRow > FromRow And FromRow > 1 Then

@@ -60,6 +60,8 @@
         Return settings.PrinterName
     End Function
     Sub LogTrackInfo(MenuItem As String) 'Use Azure application insights
+        'https://carldesouza.com/how-to-create-custom-events-metrics-traces-in-azure-application-insights-using-c/
+        'install the Microsoft.ApplicationInsights NuGet package
         Dim UserName As String
         Dim PubVer As String
         Dim EventProperties = New Dictionary(Of String, String)
