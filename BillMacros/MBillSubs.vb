@@ -1,9 +1,15 @@
 ﻿Module MBillSubs
     Function ItemIsNotEmpty(Billsheet As Excel.Worksheet, ItemRow As Integer) As Boolean
+        'Returns true if Qty, Rate or Amt columns contain something but returns false ifthe qty column is "0" (numeric zero)
         ItemIsNotEmpty = False
         With Billsheet
             If xlAp.WorksheetFunction.CountA(.Range(.Cells(ItemRow, QtyCol), .Cells(ItemRow, AmtCol))) > 0 Then
                 ItemIsNotEmpty = True
+            End If
+            If IsNumeric(.Cells(ItemRow, QtyCol).value) Then 'Only check numeric values
+                If .Cells(ItemRow, QtyCol).value = 0 Then
+                    ItemIsNotEmpty = False
+                End If
             End If
         End With
     End Function
