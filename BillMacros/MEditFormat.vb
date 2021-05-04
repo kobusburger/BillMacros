@@ -19,12 +19,14 @@
         End If
         FSSel.Dispose()
 
+        xlAp.Application.Cursor = Excel.XlMousePointer.xlWait
         For Each Wksht In BillSheets
             If CheckSheetType(Wksht) = "#BillSheet#" Then
                 Wksht.Select()
                 EditFormatSub(Wksht)
             End If
         Next
+        xlAp.Application.Cursor = Excel.XlMousePointer.xlDefault
         xlWb.Sheets(ActShtName).Select
     End Sub
     Sub EditFormatSub(Billsheet As Excel.Worksheet)
@@ -44,16 +46,16 @@
                     Select Case UCase(Trim(.Cells(BillRow, 1).value))
                         Case "PB"
                             .Rows(BillRow).Delete
-                            BillRow = BillRow - 1
-                            LastBillRow = LastBillRow - 1
+                            BillRow -= 1
+                            LastBillRow -= 1
                         Case Else
                             If xlAp.WorksheetFunction.CountA(.Rows(BillRow)) = 0 Then 'delete empty rows
                                 .Rows(BillRow).Delete
-                                BillRow = BillRow - 1
-                                LastBillRow = LastBillRow - 1
+                                BillRow -= 1
+                                LastBillRow -= 1
                             End If
                     End Select
-                    BillRow = BillRow + 1
+                    BillRow += 1
                 Loop
                 .Cells(1, 1).EntireColumn.Hidden = False
                 .Rows.AutoFit()

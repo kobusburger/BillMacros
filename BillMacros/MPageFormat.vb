@@ -29,6 +29,7 @@
         End If
         FSSel.Dispose()
 
+        xlAp.Application.Cursor = Excel.XlMousePointer.xlWait
         For Each Wksht In BillSheets
             Wksht.Select()
 
@@ -44,6 +45,7 @@
             End If
         Next
         StartSht.Select()
+        xlAp.Application.Cursor = Excel.XlMousePointer.xlDefault
     End Sub
     Sub PageFormatSub(Billsheet As Excel.Worksheet)
         'This function does the following:
@@ -81,14 +83,14 @@
                                 .Rows(BillRow).AutoFit
                                 .Rows(BillRow + 1).Insert(shift:=Excel.XlDirection.xlDown)
                                 BillTemplate.Range("Blank").Copy(.Cells(BillRow + 1, 1))
-                                EndBillRow = EndBillRow + 1
+                                EndBillRow += 1
                                 IncrementNoItems()
                                 CopyBillRow(Billsheet, BillTemplate.Range(RowType), .Cells(BillRow, 1))
-                                BillRow = BillRow + 1
+                                BillRow += 1
                             Else
                                 .Rows(BillRow).Hidden = True
                             End If
-                            BillRow = BillRow + BillTemplate.Range(RowType).Rows.Count
+                            BillRow += BillTemplate.Range(RowType).Rows.Count
 
                         Case "IHDR", "IHDR1", "IHDR2", "IHDR3"
                             HideHdrGrpRows(Billsheet, BillRow, RowType)
@@ -99,41 +101,41 @@
                             .Rows(BillRow).AutoFit
                             .Rows(BillRow + 1).Insert(shift:=Excel.XlDirection.xlDown)
                             BillTemplate.Range("Blank").Copy(.Cells(BillRow + 1, 1))
-                            EndBillRow = EndBillRow + 1
+                            EndBillRow += 1
                             BillRow = BillRow + BillTemplate.Range(RowType).Rows.Count + 1 'todo Should multirow types be allowed?
 
                         Case "#BILLEND#"
                             HideHdrGrpRows(Billsheet, BillRow, RowType)
                             BillTemplate.Range("BILLEND").Copy(.Cells(BillRow, 1))
-                            BillRow = BillRow + BillTemplate.Range("BILLEND").Rows.Count
+                            BillRow += BillTemplate.Range("BILLEND").Rows.Count
 
                         Case "#BILLSHEET#"
                             'Only formats are copied
                             BillTemplate.Range("BILLSHEET").Copy()
                             .Cells(BillRow, 1).PasteSpecial(Paste:=Excel.XlPasteType.xlPasteFormats, Operation:=Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone, SkipBlanks:=False, Transpose:=False)
-                            BillRow = BillRow + BillTemplate.Range("BILLSHEET").Rows.Count
+                            BillRow += BillTemplate.Range("BILLSHEET").Rows.Count
 
                         Case "COLHDR"
                             BillTemplate.Range("COLHDR").Copy(.Cells(BillRow, 1))
-                            BillRow = BillRow + BillTemplate.Range(RowType).Rows.Count
+                            BillRow += BillTemplate.Range(RowType).Rows.Count
 
                         Case "NOTE"
                             CopyBillRow(Billsheet, BillTemplate.Range(RowType), .Cells(BillRow, 1))
                             .Rows(BillRow + 1).Insert(shift:=Excel.XlDirection.xlDown)
                             BillTemplate.Range("Blank").Copy(.Cells(BillRow + 1, 1))
-                            EndBillRow = EndBillRow + 1
-                            BillRow = BillRow + 1
-                            BillRow = BillRow + BillTemplate.Range("NOTE").Rows.Count
+                            EndBillRow += 1
+                            BillRow += 1
+                            BillRow += BillTemplate.Range("NOTE").Rows.Count
 
                         Case "" 'Hide row for empty row type
                             .Rows(BillRow).Hidden = True
-                            BillRow = BillRow + 1
+                            BillRow += 1
 
                         Case Else 'Treat other row types as NOTE
                             .Rows(BillRow + 1).Insert(shift:=Excel.XlDirection.xlDown)
-                            EndBillRow = EndBillRow + 1
-                            BillRow = BillRow + 1
-                            BillRow = BillRow + BillTemplate.Range("NOTE").Rows.Count
+                            EndBillRow += 1
+                            BillRow += 1
+                            BillRow += BillTemplate.Range("NOTE").Rows.Count
                     End Select
                 Loop
                 .PageSetup.PrintArea = .Range(.Cells(1, 2), .Cells(EndBillRow + 2, 8)).Address
@@ -287,7 +289,7 @@
                 Select Case .Cells(BillRow, 1).value
                     Case "PB"
                         .Rows(BillRow).Delete
-                        BillRow = BillRow - 1
+                        BillRow -= 1
                         LastBillRow = .Columns(1).Find("#BillEnd#").Row
                 End Select
             Next
@@ -297,8 +299,8 @@
         'This should be called for each new measured item
         'The relevant counters will be incremented depending in which group the item is
         Dim HdLv As Integer, i As Integer, PrHdrRow As Integer
-        NoShtItems = NoShtItems + 1
-        HItNo = HItNo + 1
+        NoShtItems += 1
+        HItNo += 1
         PrHdrRow = xlAp.WorksheetFunction.Max(HdrInfo(0).PrevHdrRow, HdrInfo(1).PrevHdrRow, HdrInfo(2).PrevHdrRow, HdrInfo(3).PrevHdrRow)
         If PrHdrRow = 0 Then Exit Sub 'The item is not in an hdr group i.e. before any hdrs
         Select Case PrHdrRow

@@ -129,8 +129,8 @@
             For RowNo = 1 To TotRows
                 If Wksht.Rows(RowNo).Hidden Then
                     Wksht.Rows(RowNo).Delete
-                    TotRows = TotRows - 1
-                    RowNo = RowNo - 1
+                    TotRows -= 1
+                    RowNo -= 1
                 End If
             Next
             xlAp.ActiveWindow.FreezePanes = False

@@ -27,7 +27,7 @@
                     .Rows(SumRow).Insert(shift:=Excel.XlDirection.xlDown)
                     InsertSumRow(SumSheet, Wksht, SumRow)
                     .Rows(SumRow).AutoFit
-                    SumRow = SumRow + 1
+                    SumRow += 1
                 End If
             Next
             SumSheet.Activate()

@@ -230,29 +230,35 @@
     Sub DeleteBlankRows()
         'This function Deletes empty rows in the selected rows
         Dim RowNo As Integer, LastRow As Integer
+        Dim i As Long
         Dim StartRow As Integer
         Dim SelectedRows As Excel.Range
         xlWb = xlAp.ActiveWorkbook
         xlSh = xlWb.ActiveSheet
+        xlAp.Application.Cursor = Excel.XlMousePointer.xlWait
         SelectedRows = xlAp.Selection
         LastRow = SelectedRows.Rows.Count + SelectedRows.Row - 1
         If LastRow > xlSh.UsedRange.Rows.Count Then LastRow = xlSh.UsedRange.Rows.Count 'Limit LastRow to used range
         StartRow = SelectedRows.Row
-        'xlAp.ScreenUpdating = False
+        xlAp.ScreenUpdating = False
         RowNo = StartRow
+        i = 0
         While RowNo <= LastRow 'Use While because the variable of For may not be changed
-            xlAp.StatusBar = "Row: " & RowNo & " of: " & LastRow
+            i += 1
+            xlAp.StatusBar = Format(RowNo / LastRow, "#0.00%") & " of: " & LastRow & " rows"
+
             If xlAp.WorksheetFunction.CountA(xlSh.Rows(RowNo)) = 0 Then 'delete empty rows
                 xlSh.Rows(RowNo).entirerow.delete
-                LastRow = LastRow - 1
+                LastRow -= 1
             Else
-                RowNo = RowNo + 1
+                RowNo += 1
             End If
-            If RowNo Mod 10 = 0 Then Windows.Forms.Application.DoEvents() 'DoEvents was added to avoid RuntimeCallableWrapper failed error
+            If i Mod 10 = 0 Then Windows.Forms.Application.DoEvents() 'DoEvents was added to avoid RuntimeCallableWrapper failed error
         End While
 
         xlAp.ScreenUpdating = True
         xlAp.StatusBar = False
+        xlAp.Application.Cursor = Excel.XlMousePointer.xlDefault
     End Sub
 
 End Module
