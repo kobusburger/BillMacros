@@ -61,6 +61,7 @@
         GetAllInfoPar() 'Put the page parameters on the Info sheet into BillInfoDict
         If CheckSheetType(Billsheet) = "#BillSheet#" Then
             xlAp.ScreenUpdating = False
+            xlAp.Calculation = Excel.XlCalculation.xlCalculationManual
             DeletePageBreaks(Billsheet)
 
             'Initialise HdrInfo & counter to zero
@@ -156,6 +157,7 @@
         xlAp.ActiveWindow.FreezePanes = True
 
         xlAp.ScreenUpdating = True
+        xlAp.Calculation = Excel.XlCalculation.xlCalculationAutomatic
         xlAp.StatusBar = False
     End Sub
     Function GetRowType(RowTypeText As String) As String

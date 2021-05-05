@@ -38,6 +38,7 @@
         If CheckSheetType(Billsheet) = "#BillSheet#" Then
             With Billsheet
                 xlAp.ScreenUpdating = False
+                xlAp.Calculation = Excel.XlCalculation.xlCalculationManual
                 LastBillRow = .Columns(1).Find("#BillEnd#").Row
                 BillRow = 1
                 Do While BillRow <= LastBillRow 'Use a Do While because a For Next loop can be endless if the end value is changed
@@ -62,6 +63,7 @@
             End With
         End If
         xlAp.ScreenUpdating = True
+        xlAp.Calculation = Excel.XlCalculation.xlCalculationAutomatic
         'freeze pane
         xlAp.ActiveWindow.FreezePanes = False
         xlAp.ActiveWindow.Split = False
