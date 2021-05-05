@@ -241,6 +241,7 @@
         If LastRow > xlSh.UsedRange.Rows.Count Then LastRow = xlSh.UsedRange.Rows.Count 'Limit LastRow to used range
         StartRow = SelectedRows.Row
         xlAp.ScreenUpdating = False
+        xlAp.Calculation = Excel.XlCalculation.xlCalculationManual
         RowNo = StartRow
         i = 0
         While RowNo <= LastRow 'Use While because the variable of For may not be changed
@@ -257,6 +258,7 @@
         End While
 
         xlAp.ScreenUpdating = True
+        xlAp.Calculation = Excel.XlCalculation.xlCalculationAutomatic
         xlAp.StatusBar = False
         xlAp.Application.Cursor = Excel.XlMousePointer.xlDefault
     End Sub
