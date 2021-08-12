@@ -1,5 +1,5 @@
 ﻿Module MGlobals
-    Public Const _
+    Public _
     RefCol As Integer = 2,
     ItemNoCol As Integer = 3,
     DescrCol As Integer = 4,
@@ -10,7 +10,7 @@
     PricedRateCol As Integer = 10,
     PricedAmtCol As Integer = 11
 
-    Public Const _
+    Public _
     SumNoCol As Integer = 2,
     SumDesrCol As Integer = 3,
     SumAmtCol As Integer = 4,
@@ -28,7 +28,25 @@
     Public xlWb As Excel.Workbook
     Public xlSh As Excel.Worksheet
     Public tc As New Microsoft.ApplicationInsights.TelemetryClient
-
+    Sub InitializeSumColNos()
+        Dim SumTemplate As Excel.Worksheet = xlWb.Worksheets("SumTemplate")
+        If SumTemplate.Range("Columns").Find("#SumNoCol") IsNot Nothing Then SumNoCol = SumTemplate.Range("Columns").Find("#SumNoCol").Column
+        If SumTemplate.Range("Columns").Find("#SumDesrCol") IsNot Nothing Then SumDesrCol = SumTemplate.Range("Columns").Find("#SumDesrCol").Column
+        If SumTemplate.Range("Columns").Find("#SumAmtCol") IsNot Nothing Then SumAmtCol = SumTemplate.Range("Columns").Find("#SumAmtCol").Column
+        If SumTemplate.Range("Columns").Find("#SumPricedAmtCol") IsNot Nothing Then SumPricedAmtCol = SumTemplate.Range("Columns").Find("#SumPricedAmtCol").Column
+    End Sub
+    Sub InitializeBillColNos()
+        Dim BillTemplate As Excel.Worksheet = xlWb.Worksheets("BillTemplate")
+        If BillTemplate.Range("Columns").Find("#RefCol") IsNot Nothing Then RefCol = BillTemplate.Range("Columns").Find("#RefCol").Column
+        If BillTemplate.Range("Columns").Find("#ItemNoCol") IsNot Nothing Then ItemNoCol = BillTemplate.Range("Columns").Find("#ItemNoCol").Column
+        If BillTemplate.Range("Columns").Find("#DescrCol") IsNot Nothing Then DescrCol = BillTemplate.Range("Columns").Find("#DescrCol").Column
+        If BillTemplate.Range("Columns").Find("#UnitCol") IsNot Nothing Then UnitCol = BillTemplate.Range("Columns").Find("#UnitCol").Column
+        If BillTemplate.Range("Columns").Find("#QtyCol") IsNot Nothing Then QtyCol = BillTemplate.Range("Columns").Find("#QtyCol").Column
+        If BillTemplate.Range("Columns").Find("#RateCol") IsNot Nothing Then RateCol = BillTemplate.Range("Columns").Find("#RateCol").Column
+        If BillTemplate.Range("Columns").Find("#AmtCol") IsNot Nothing Then AmtCol = BillTemplate.Range("Columns").Find("#AmtCol").Column
+        If BillTemplate.Range("Columns").Find("#PricedRateCo") IsNot Nothing Then PricedRateCol = BillTemplate.Range("Columns").Find("#PricedRateCo").Column
+        If BillTemplate.Range("Columns").Find("#PricedAmtCol") IsNot Nothing Then PricedAmtCol = BillTemplate.Range("Columns").Find("#PricedAmtCol").Column
+    End Sub
     Sub AboutBill()
         Dim Msg As String
         Dim TerminationDate As Date

@@ -41,70 +41,6 @@
             End Select
         End With
     End Function
-
-    'Function GetInfoPar(InfoPar As String) As String
-    '    Dim BillInfoSheet As Excel.Worksheet
-    '    Dim EndBillInfoRow As Integer, InfoRow As Integer
-    '    BillInfoSheet = GetInfoSheet()
-    '    GetInfoPar = ""
-    '    If BillInfoSheet Is Nothing Then Exit Function
-
-    '    EndBillInfoRow = BillInfoSheet.Columns(1).Find("#EndBillInfo#").Row
-    '    For InfoRow = 2 To EndBillInfoRow
-    '        If BillInfoSheet.Cells(InfoRow, 1).value = InfoPar Then
-    '            GetInfoPar = BillInfoSheet.Cells(InfoRow, 2).Value
-    '        End If
-    '    Next
-    'End Function
-    'Sub SetInfoPar(InfoPar As String, ParVal As Object)
-    '    Dim BillInfoSheet As Excel.Worksheet
-    '    Dim EndBillInfoRow As Integer, InfoRow As Integer
-    '    BillInfoSheet = GetInfoSheet()
-    '    If BillInfoSheet Is Nothing Then Exit Sub
-
-    '    EndBillInfoRow = BillInfoSheet.Columns(1).Find("#EndBillInfo#").Row
-    '    For InfoRow = 2 To EndBillInfoRow
-    '        If BillInfoSheet.Cells(InfoRow, 1).value = InfoPar Then
-    '            BillInfoSheet.Cells(InfoRow, 2).Value = ParVal
-    '        End If
-    '    Next
-    'End Sub
-    'Function GetInfoSheet() As Excel.Worksheet
-    '    'Search for "Info" sheet and insert if it does not exist
-    '    Dim Wksht As Excel.Worksheet
-    '    Dim XlTemplate As Excel.Workbook
-
-    '    GetInfoSheet = Nothing
-    '    On Error Resume Next
-    '    GetInfoSheet = XlWb.Worksheets("Info")
-    '    On Error GoTo 0
-    '    If GetInfoSheet Is Nothing Then
-    '        xlAp.Workbooks(BillMacrosTemplate).Worksheets("Info").Copy(Before:=BillSheets(1))
-    '        GetInfoSheet = XlWb.Worksheets("Info")
-    '        MsgBox("The Info sheet was created because it did not exist", vbOKOnly)
-    '    End If
-    '    GetInfoSheet.Tab.Color = Excel.XlRgbColor.rgbBlue
-    'End Function
-    'Function GetBillTemplateSheet() As Excel.Worksheet
-    '    'Search for "BillTemplate" sheet and insert if it does not exist
-    '    Dim Wksht As Excel.Worksheet
-
-    '    GetBillTemplateSheet = Nothing
-    '    On Error Resume Next
-    '    GetBillTemplateSheet = XlWb.Worksheets("BillTemplate")
-    '    On Error GoTo 0
-    '    If GetBillTemplateSheet Is Nothing Or Not CheckNamedRanges(BillSheets, "BillTemplate") Then
-    '        xlAp.DisplayAlerts = False
-    '        On Error Resume Next
-    '        GetBillTemplateSheet.Delete()
-    '        On Error GoTo 0
-    '        xlAp.DisplayAlerts = True
-    '        xlAp.Workbooks(BillMacrosTemplate).Worksheets("BillTemplate").Copy(Before:=BillSheets(1))
-    '        GetBillTemplateSheet = XlWb.Worksheets("BillTemplate")
-    '        MsgBox("The BillTemplate sheet was created because it did not exist or replaced because some of the named ranges do not exist", vbOKOnly)
-    '    End If
-    '    GetBillTemplateSheet.Tab.Color = Excel.XlRgbColor.rgbBlue
-    'End Function
     Function CheckNamedRanges(BillSheets As Excel.Sheets, SheetName As String) As Boolean
         'Returns false if some range names in BillMacrosTemplate do not exist in the Bill Workbook template
         'It is assumed that SheetName exists
@@ -166,7 +102,6 @@
         Dim Cell As Excel.Range
         Dim BillSheets As Excel.Sheets
         Dim FormulasRange As Excel.Range
-        xlWb = xlAp.ActiveWorkbook
         BillSheets = xlWb.Worksheets
 
         On Error Resume Next
@@ -206,7 +141,6 @@
         xlAp.ScreenUpdating = False 'Stop screen updating so that the second workbook does not show
         'It is not possible to copy worksheet objects between excel instances, only between workbooks in the same instance
 
-        xlWb = xlAp.ActiveWorkbook
         xlAp.DisplayAlerts = False
         On Error Resume Next
         xlWb.Worksheets(SheetName).Delete()
@@ -236,18 +170,22 @@
         xlWb = xlAp.ActiveWorkbook
         xlSh = xlWb.ActiveSheet
         xlAp.Application.Cursor = Excel.XlMousePointer.xlWait
+        xlAp.ScreenUpdating = False
+        xlSh.DisplayPageBreaks = False
+        xlAp.EnableEvents = False
+        xlAp.Calculation = Excel.XlCalculation.xlCalculationManual
+
         SelectedRows = xlAp.Selection
         LastRow = SelectedRows.Rows.Count + SelectedRows.Row - 1
         If LastRow > xlSh.UsedRange.Rows.Count Then LastRow = xlSh.UsedRange.Rows.Count 'Limit LastRow to used range
         StartRow = SelectedRows.Row
-        xlAp.ScreenUpdating = False
-        xlAp.Calculation = Excel.XlCalculation.xlCalculationManual
         RowNo = StartRow
         i = 0
         While RowNo <= LastRow 'Use While because the variable of For may not be changed
             i += 1
-            xlAp.StatusBar = Format(RowNo / LastRow, "#0.00%") & " of: " & LastRow & " rows"
-
+            If i Mod 50 = 0 Then
+                xlAp.StatusBar = Format(RowNo / LastRow, "#0.0%") & " of " & LastRow & " rows"
+            End If
             If xlAp.WorksheetFunction.CountA(xlSh.Rows(RowNo)) = 0 Then 'delete empty rows
                 xlSh.Rows(RowNo).entirerow.delete
                 LastRow -= 1
@@ -260,7 +198,9 @@
         xlAp.ScreenUpdating = True
         xlAp.Calculation = Excel.XlCalculation.xlCalculationAutomatic
         xlAp.StatusBar = False
+        xlSh.DisplayPageBreaks = True
         xlAp.Application.Cursor = Excel.XlMousePointer.xlDefault
+        xlAp.EnableEvents = True
     End Sub
 
 End Module

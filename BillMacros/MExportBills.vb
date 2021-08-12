@@ -33,6 +33,8 @@
         Dim Wksht As Excel.Worksheet, FName As String
         XlWb = xlAp.ActiveWorkbook
         XlSh = XlWb.ActiveSheet
+        CheckTemplateSheet("BillTemplate") 'Check BillTemplate sheet and named ranges and insert/ replace if not correct
+        InitializeBillColNos()
         'Save bill with new name
         FName = Left(XlWb.Name, (InStrRev(XlWb.Name, ".", -1, vbTextCompare) - 1))
         If Not xlAp.Dialogs(Excel.XlBuiltInDialog.xlDialogSaveAs).Show(FName & " Stripped") Then Exit Sub
@@ -69,6 +71,8 @@
         Dim MaxRowNo As Integer, MaxColNo As Integer
         XlWb = xlAp.ActiveWorkbook
         XlSh = XlWb.ActiveSheet
+        CheckTemplateSheet("BillTemplate") 'Check BillTemplate sheet and named ranges and insert/ replace if not correct
+        InitializeBillColNos()
         'Save bill with new name
         FName = Left(XlWb.Name, (InStrRev(XlWb.Name, ".", -1, vbTextCompare) - 1))
         If Not xlAp.Dialogs(Excel.XlBuiltInDialog.xlDialogSaveAs).Show(FName & " Priced") Then Exit Sub

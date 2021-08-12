@@ -12,7 +12,7 @@
 
         SumSheet = GetSumSheet() 'Insert SumSheet if it does not exist
         CheckTemplateSheet("SumTemplate") 'Check SumTemplate sheet and named ranges and insert/ replace if not correct
-
+        InitializeSumColNos()
         LogTrackInfo("CreateSum")
         With SumSheet
             xlAp.ScreenUpdating = False
@@ -44,7 +44,8 @@
         Dim SumBillRowRows As Integer
         Dim NewSumBillRow As Excel.Range
 
-        SumTemplate = XlWb.Worksheets("SumTemplate")
+        SumTemplate = xlWb.Worksheets("SumTemplate")
+
         SumBillRowCols = SumTemplate.Range("SumBillRow").Columns.Count
         SumBillRowRows = SumTemplate.Range("SumBillRow").Rows.Count
         SumTemplate.Range("SumBillRow").Copy(SumSheet.Cells(SumRow, 1))

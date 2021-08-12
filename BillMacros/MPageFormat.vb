@@ -22,6 +22,7 @@
         If FSSel.DialogResult <> System.Windows.Forms.DialogResult.OK Then Return
 
         CheckTemplateSheet("BillTemplate") 'Check BillTemplate sheet and named ranges and insert/ replace if not correct
+        InitializeBillColNos()
         LogTrackInfo("PageFormat")
         BillSheets = XlWb.Worksheets
         If FSSel.SelSheets.Checked = True Then
@@ -55,8 +56,7 @@
         '- Sets freeze panes
         Dim BillRow As Integer, EndBillRow As Integer
         Dim RowType As String
-        XlWb = xlAp.ActiveWorkbook
-        Dim BillTemplate As Excel.Worksheet = XlWb.Worksheets("BillTemplate")
+        Dim BillTemplate As Excel.Worksheet = xlWb.Worksheets("BillTemplate")
 
         GetAllInfoPar() 'Put the page parameters on the Info sheet into BillInfoDict
         If CheckSheetType(Billsheet) = "#BillSheet#" Then
@@ -139,9 +139,9 @@
                             BillRow += BillTemplate.Range("NOTE").Rows.Count
                     End Select
                 Loop
-                .PageSetup.PrintArea = .Range(.Cells(1, 2), .Cells(EndBillRow + 2, 8)).Address
+                .PageSetup.PrintArea = .Range(.Cells(1, 2), .Cells(EndBillRow + 2, AmtCol)).Address
                 .Cells(1, 1).EntireColumn.Hidden = True
-                .PageSetup.PrintArea = .Range(.Cells(1, 2), .Cells(EndBillRow + 2, 8)).Address
+                .PageSetup.PrintArea = .Range(.Cells(1, 2), .Cells(EndBillRow + 2, AmtCol)).Address
                 If BillInfoDict.ContainsKey("PrintTitleRows") Then .PageSetup.PrintTitleRows = BillInfoDict("PrintTitleRows")
             End With
             SetForcedPagePar(Billsheet)   'Set the forced page parameters that affect page breaks
