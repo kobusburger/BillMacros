@@ -57,6 +57,7 @@
         Dim BillRow As Integer, EndBillRow As Integer
         Dim RowType As String
         Dim BillTemplate As Excel.Worksheet = xlWb.Worksheets("BillTemplate")
+        Dim SplitRow As Long
 
         GetAllInfoPar() 'Put the page parameters on the Info sheet into BillInfoDict
         If CheckSheetType(Billsheet) = "#BillSheet#" Then
@@ -119,6 +120,7 @@
                         Case "COLHDR"
                             BillTemplate.Range("COLHDR").Copy(.Cells(BillRow, 1))
                             BillRow += BillTemplate.Range(RowType).Rows.Count
+                            SplitRow = BillRow - 1
 
                         Case "NOTE"
                             CopyBillRow(Billsheet, BillTemplate.Range(RowType), .Cells(BillRow, 1))
@@ -150,10 +152,10 @@
         End If
         xlAp.ActiveWindow.FreezePanes = False
         xlAp.ActiveWindow.Split = False
-        xlAp.ActiveWindow.ScrollRow = 1
-        xlAp.ActiveWindow.ScrollColumn = 1
-        xlAp.ActiveWindow.SplitColumn = 5
-        xlAp.ActiveWindow.SplitRow = 4
+        xlAp.ActiveWindow.ScrollColumn = 1 'Left column number
+        xlAp.ActiveWindow.SplitColumn = QtyCol - 1 'No of static columns
+        xlAp.ActiveWindow.ScrollRow = 1 'Top row number
+        xlAp.ActiveWindow.SplitRow = SplitRow 'No of static rows
         xlAp.ActiveWindow.FreezePanes = True
 
         xlAp.ScreenUpdating = True

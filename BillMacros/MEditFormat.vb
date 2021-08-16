@@ -34,7 +34,9 @@
         '- Removes line spacing
         '- Removes page ends
         '- Deletes empty rows
-        Dim BillRow As Integer, LastBillRow As Integer
+        Dim BillRow As Integer, LastBillRow As Integer, SplitRow As Long
+        Dim BillTemplate As Excel.Worksheet = xlWb.Worksheets("BillTemplate")
+
         If CheckSheetType(Billsheet) = "#BillSheet#" Then
             With Billsheet
                 xlAp.ScreenUpdating = False
@@ -49,6 +51,9 @@
                             .Rows(BillRow).Delete
                             BillRow -= 1
                             LastBillRow -= 1
+                        Case "COLHDR"
+                            BillRow += BillTemplate.Range("COLHDR").Rows.Count
+                            SplitRow = BillRow - 1
                         Case Else
                             If xlAp.WorksheetFunction.CountA(.Rows(BillRow)) = 0 Then 'delete empty rows
                                 .Rows(BillRow).Delete
@@ -67,10 +72,10 @@
         'freeze pane
         xlAp.ActiveWindow.FreezePanes = False
         xlAp.ActiveWindow.Split = False
-        xlAp.ActiveWindow.ScrollRow = 1
-        xlAp.ActiveWindow.ScrollColumn = 1
-        xlAp.ActiveWindow.SplitColumn = 0
-        xlAp.ActiveWindow.SplitRow = 4
+        xlAp.ActiveWindow.ScrollColumn = 1 'Left column number
+        xlAp.ActiveWindow.SplitColumn = 0 'No of static columns
+        xlAp.ActiveWindow.ScrollRow = 1 'Top row number
+        xlAp.ActiveWindow.SplitRow = SplitRow 'No of static rows
         xlAp.ActiveWindow.FreezePanes = True
 
         xlAp.StatusBar = False
