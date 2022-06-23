@@ -15,8 +15,8 @@
         Dim BillSheets As Excel.Sheets
         xlWb = xlAp.ActiveWorkbook
         xlSh = XlWb.ActiveSheet
-        StartSht = XlSh
-        ShowActivationNotice() 'Show activation warning window
+        StartSht = xlSh
+        'ShowActivationNotice() 'Show activation warning window
         FSSel.Text = "Page Format"
         FSSel.ShowDialog()
         If FSSel.DialogResult <> System.Windows.Forms.DialogResult.OK Then Return
@@ -42,7 +42,7 @@
                 Else
                     Wksht.Tab.Color = Excel.XlRgbColor.rgbYellow
                 End If
-                If Not IsActivated() Then Exit For 'todo Changing Billsheets to a single sheet creates a runtime error
+                'If Not IsActivated() Then Exit For 'todo Changing Billsheets to a single sheet creates a runtime error
             End If
         Next
         StartSht.Select()
@@ -194,11 +194,11 @@
         Dim SumRowHeights As Single, PBRowsHeight As Single
         Dim BillTemplate As Excel.Worksheet = xlWb.Worksheets("BillTemplate")
 
-        If IsActivated() Then
-            MaxPages = 100 'Limit pages in case there is an endless loop
-        Else
-            MaxPages = 2 'Limit the number of page if Bill Macros is not activated
-        End If
+        'If IsActivated() Then
+        MaxPages = 100 'Limit pages in case there is an endless loop
+        'Else
+        '    MaxPages = 2 'Limit the number of page if Bill Macros is not activated
+        'End If
 
         'Determine the page breaks and insert pagebreak (PB) rows
         With Billsheet

@@ -9,7 +9,7 @@
 
         xlSh = xlWb.ActiveSheet
         StartSht = xlSh
-        ShowActivationNotice() 'Show activation warning window
+        'ShowActivationNotice() 'Show activation warning window
         First = True
         For Each Wksht In xlWb.Worksheets
             Select Case Wksht.Tab.Color

@@ -34,7 +34,7 @@
     <PublishUrl>Publish\</PublishUrl>
     <InstallUrl />
     <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.0.0.48</ApplicationVersion>
+    <ApplicationVersion>1.0.0.49</ApplicationVersion>
     <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateInterval>0</UpdateInterval>
@@ -250,6 +250,8 @@
     </Content>
     <None Include="app.config" />
     <Compile Include="MPageFormat.vb" />
+    <None Include="BillMacros_1_TemporaryKey.pfx" />
+    <None Include="BillMacros_TemporaryKey.pfx" />
     <None Include="BilMacros Notes.docx" />
     <None Include="kbeng.pfx" />
     <None Include="packages.config" />
@@ -307,11 +309,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>
-    </ManifestKeyFile>
+    <ManifestKeyFile>BillMacros_1_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>6803275B05EECBDFC52A9D718E09C04D7E6EB7D6</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>650014CC7407B4E137AAC724EFCF07321D209890</ManifestCertificateThumbprint>
   </PropertyGroup>
   <!-- Include the build rules for a Visual Basic project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

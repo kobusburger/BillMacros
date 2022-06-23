@@ -12,7 +12,7 @@
 
         xlSh = xlWb.ActiveSheet
         ActShtName = xlSh.Name
-        ShowActivationNotice() 'Show activation warning window
+        'ShowActivationNotice() 'Show activation warning window
 
         FSSel.Text = "Setup page"
         FSSel.ShowDialog()

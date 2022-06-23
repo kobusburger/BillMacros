@@ -48,6 +48,12 @@
         If BillTemplate.Range("Columns").Find("#PricedAmtCol") IsNot Nothing Then PricedAmtCol = BillTemplate.Range("Columns").Find("#PricedAmtCol").Column
     End Sub
     Sub AboutBill()
+        'https://blog.codinghorror.com/determining-build-date-the-hard-way/
+        'When specifying a version, you have to at least specify major. If you specify major And minor, you can specify an asterisk (*) for build.
+        'This will cause build to be equal to the number of days since January 1, 2000 local time, And for revision to be equal to the number of seconds since midnight local time, divided by 2.
+        'If you Then specify major, minor, And build, you can specify an asterisk For revision.
+        'This will cause revision To be equal To the number Of seconds since midnight local time, divided by 2.
+
         Dim Msg As String
         Dim TerminationDate As Date
         Dim PublishVersion As String

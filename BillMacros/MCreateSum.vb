@@ -8,7 +8,7 @@
         xlWb = xlAp.ActiveWorkbook
         xlSh = xlWb.ActiveSheet
         BillSheets = xlWb.Worksheets
-        ShowActivationNotice() 'Show termination warning
+        'ShowActivationNotice() 'Show termination warning
 
         SumSheet = GetSumSheet() 'Insert SumSheet if it does not exist
         CheckTemplateSheet("SumTemplate") 'Check SumTemplate sheet and named ranges and insert/ replace if not correct

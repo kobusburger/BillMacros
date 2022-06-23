@@ -7,7 +7,7 @@
         xlWb = xlAp.ActiveWorkbook
         xlSh = xlWb.ActiveSheet
         ActShtName = xlSh.Name
-        ShowActivationNotice() 'Show activation warning window
+        'ShowActivationNotice() 'Show activation warning window
         FSSel.Text = "Edit Format"
         FSSel.ShowDialog()
         If FSSel.DialogResult <> System.Windows.Forms.DialogResult.OK Then Return
