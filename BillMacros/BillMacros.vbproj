@@ -25,7 +25,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>BillMacros</RootNamespace>
     <AssemblyName>BillMacros</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <DefineConstants>VSTO40</DefineConstants>
     <StartupObject>
     </StartupObject>
@@ -251,10 +251,10 @@
     <None Include="app.config" />
     <Compile Include="MPageFormat.vb" />
     <None Include="BillMacros_1_TemporaryKey.pfx" />
+    <None Include="BillMacros_3_TemporaryKey.pfx" />
     <None Include="BillMacros_TemporaryKey.pfx" />
     <None Include="BilMacros Notes.docx" />
     <None Include="kbeng.pfx" />
-    <None Include="packages.config" />
     <None Include="ThisAddIn.Designer.xml">
       <DependentUpon>ThisAddIn.vb</DependentUpon>
     </None>
@@ -309,10 +309,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>BillMacros_1_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>BillMacros_3_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>650014CC7407B4E137AAC724EFCF07321D209890</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>30268AE10650E63D777AEBB5DABD588682B6287F</ManifestCertificateThumbprint>
   </PropertyGroup>
   <!-- Include the build rules for a Visual Basic project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

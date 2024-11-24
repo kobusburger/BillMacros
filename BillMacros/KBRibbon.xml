@@ -15,12 +15,19 @@
               screentip="Set headers, footers, margins, etc." onAction="OnSetPage"/>
           <button id="CreateSummary" label="Create Summary"
               screentip="Create Summary sheet" onAction="OnCreateSum"/>
-          <button id="CreateStrippedBill" label="Create Stripped Bill"
-              screentip="Create a bill without formulas and redundant information" onAction="OnCreateStripped"/>
-          <button id="CreatePricedBill" label="Create Priced Bill"
-              screentip="Create a priced bill without formulas and redundant information" onAction="OnCreatePriced"/>
-          <button id="DeleteBlankRows" label="Delete blank rows"
+			<button id="DeleteBlankRows" label="Delete blank rows"
               screentip="Ony the blank rows (rows with only empty cells) in the selected rows will be deleted" onAction="OnDeleteBlankRows"/>
+			<splitButton id="Splitbutton1" >
+				<button id="ExportBills" label="Export Bills"/>
+				<menu id="menu">
+					<button id="CreatePricedBill" label="Create Priced Bill"
+						screentip="Create a priced bill without formulas and redundant information" onAction="OnCreatePriced"/>
+					<button id="CreateTenderBill" label="Create Tender Bill"
+						screentip="Create a tender bill without redundant information and limited formulas" onAction="OnCreateTender"/>
+					<button id="CreateStrippedBill" label="Create Stripped Bill"
+						screentip="Create a bill without formulas and redundant information" onAction="OnCreateStripped"/>
+				</menu>
+			</splitButton>						
           <button id="About" label="About"
               screentip="Additional information on Bill Macros" onAction="OnAboutBill"/>
         </group>

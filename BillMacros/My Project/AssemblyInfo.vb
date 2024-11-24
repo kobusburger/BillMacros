@@ -13,7 +13,7 @@ Imports System.Security
 <Assembly: AssemblyDescription("")> 
 <Assembly: AssemblyCompany("")> 
 <Assembly: AssemblyProduct("BillMacros")>
-<Assembly: AssemblyCopyright("Copyright ©  2022")>
+<Assembly: AssemblyCopyright("Copyright ©  2024")>
 <Assembly: AssemblyTrademark("")> 
 
 ' Setting ComVisible to false makes the types in this assembly not visible 

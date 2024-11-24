@@ -48,6 +48,9 @@ Public Class KBRibbon
     Public Sub OnCreateStripped(ByVal control As Office.IRibbonControl)
         CreateStripped()
     End Sub
+    Public Sub OnCreateTender(ByVal control As Office.IRibbonControl)
+        CreateTenderBill()
+    End Sub
     Public Sub OnCreatePriced(ByVal control As Office.IRibbonControl)
         CreatePriced()
     End Sub
